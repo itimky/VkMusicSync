@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="action_logout">Log out</string>
+    <string name="all_audio">All audio</string>
+    <string name="already_downloaded">This track has been already downloaded. Do you want to overwrite it?</string>
+    <string name="app_name">VkMusicSync</string>
+    <string name="cancel_downloading">Cancel the downloading?</string>
+    <string name="drawer_close">Close drawer</string>
+    <string name="drawer_open">Open drawer</string>
+    <string name="no">No</string>
+    <string name="playlists">Playlists</string>
+    <string name="progress_state" formatted="false">%.2f Mb / %.2f Mb</string>
+    <string name="sync_first_100">Download top 100</string>
+    <string name="title_activity_login">Login</string>
+    <string name="update">Update</string>
+    <string name="yes">Yes</string>
+
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_sign_in_force">In Force</string>
+    <string name="action_sign_in_short">In Short</string>
+    <string name="vk_enter_captcha_text">Введите текст с картинки</string>
+    <string name="vk_retry">Повторить</string>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="action_logout">Выйти</string>
+    <string name="all_audio">Все аудиозаписи</string>
+    <string name="already_downloaded">Этот трек уже был загружен. Хотите перезаписать его?</string>
+    <string name="app_name">VkMusicSync</string>
+    <string name="cancel_downloading">Отменить загрузку?</string>
+    <string name="drawer_close">Close drawer</string>
+    <string name="drawer_open">Open drawer</string>
+    <string name="no">Нет</string>
+    <string name="playlists">Плей-листы</string>
+    <string name="progress_state" formatted="false">%.2f Мб / %.2f Мб</string>
+    <string name="sync_first_100">Скачать первые 100</string>
+    <string name="title_activity_login">Вход</string>
+    <string name="update">Обновить</string>
+    <string name="yes">Да</string>
+
+</resources>

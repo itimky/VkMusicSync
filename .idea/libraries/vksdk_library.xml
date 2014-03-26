@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="vksdk_library">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/vkmusicsync/external/vksdk_library" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

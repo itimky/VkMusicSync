@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="VkTheme" parent="Theme.AppCompat.Light">
+        <item name="android:textColor">@color/VkDarkColor</item>
+        <item name="android:actionBarStyle">@style/VkActionBarStyle</item>
+    </style>
+
+    <style name="VkActionBarStyle" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/vk_color</item>
+    </style>
+
+</resources>

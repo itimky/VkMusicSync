@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:custom="http://schemas.android.com/apk/res/com.handmark.pulltorefresh.library">
+
+    <!--<style name="VkTheme" parent="@android:style/Theme.Light">-->
+        <!--<item name="android:textColor">@color/vk_color</item>-->
+    <!--</style>-->
+    <style name="VkTheme" parent="Theme.AppCompat.Light">
+        <item name="android:textColor">@color/VkDarkColor</item>
+    </style>
+
+    <style name="VKListViewStyle">
+        <item name="android:divider">@color/VkDarkColor</item>
+        <item name="android:dividerHeight">1px</item>
+    </style>
+
+    <style name="VKListViewStyle.Navigation">
+        <item name="android:layout_width">240dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:choiceMode">singleChoice</item>
+
+    </style>
+
+    <style name="VKListViewStyle.PullToRefresh">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="ptrHeaderTextColor">@color/VkDarkColor</item>
+        <item name="ptrHeaderTextAppearance">?android:attr/textAppearanceSmall</item>
+    </style>
+
+    <style name="VkListViewItemContainerStyle">
+        <item name="android:orientation">horizontal</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:weightSum">100</item>
+        <item name="android:baselineAligned">true</item>
+    </style>
+
+    <style name="VkListViewItemTextViewStyle">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="VkListViewItemTextViewStyle.Header">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:textColor">@color/vk_color</item>
+        <item name="android:layout_alignParentBottom">true</item>
+    </style>
+
+    <style name="VkListViewItemTextViewStyle.SubTitle">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="VkListViewItemTextViewStyle.Progress">
+        <item name="android:textSize">16sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="VkListViewItemTextViewStyle.AlbumTitle">
+        <item name="android:layout_height">40dp</item>
+    </style>
+
+    <style name="VkProgressBarStyle">
+        <item name="android:indeterminate">true</item>
+        <item name="android:visibility">visible</item>
+    </style>
+
+    <style name="VkProgressBarStyle.Loading">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerInParent">true</item>
+    </style>
+
+    <style name="VkProgressBarStyle.Downloading" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">3dp</item>
+        <item name="android:max">100</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:visibility">gone</item>
+        <item name="android:progressDrawable">@drawable/custom_progressbar</item>
+    </style>
+
+    <color name="VkDarkColor">#111111</color>
+    <!--<color name="VkLightBlueColor">#55B5BC</color>-->
+
+</resources>
+
+<!--<ProgressBar-->
+<!--android:id="@+id/bar_progress"-->
+<!--android:layout_width="fill_parent"-->
+<!--android:layout_height="3dp"-->
+<!--android:max="100"-->
+<!--android:progressDrawable="@drawable/custom_progressbar"-->
+<!--android:indeterminate="true"-->
+<!--android:visibility="gone"-->
+<!--android:layout_marginLeft="5dp"-->
+<!--style="?android:attr/progressBarStyleHorizontal" />-->
