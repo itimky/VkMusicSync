@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true">
+
+    <TextView
+        android:text="@string/playlists"
+        android:textAllCaps="true"
+        android:layout_height="40dp"
+        android:gravity="bottom"
+        style="@style/VkHeader" />
+
+    <View
+        android:gravity="bottom"
+        style="@style/VkHeaderSeparator" />
+
+</LinearLayout>

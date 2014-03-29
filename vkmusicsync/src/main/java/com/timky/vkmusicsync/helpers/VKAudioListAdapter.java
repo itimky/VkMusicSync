@@ -130,16 +130,16 @@ public class VKAudioListAdapter extends BaseAdapter {
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (audioInfo.task == null)
-                    AudioDownloader.createTask(audioInfo, filePath);
 
                 if (audioInfo.isDownloaded() && !audioInfo.isDownloading()){
                     DialogInterface.OnClickListener dialogClickListener =
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    if (which == DialogInterface.BUTTON_POSITIVE)
+                                    if (which == DialogInterface.BUTTON_POSITIVE) {
+                                        AudioDownloader.createTask(audioInfo, filePath);
                                         audioInfo.task.execute();
+                                    }
                                 }
                             };
 
@@ -164,8 +164,10 @@ public class VKAudioListAdapter extends BaseAdapter {
                             .setNegativeButton(R.string.no, dialogClickListener)
                             .setPositiveButton(R.string.yes, dialogClickListener).show();
                 }
-                else
+                else {
+                    AudioDownloader.createTask(audioInfo, filePath);
                     audioInfo.task.execute();
+                }
             }
         });
     }

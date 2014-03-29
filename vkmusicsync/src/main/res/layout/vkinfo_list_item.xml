@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/VkListViewItemContainerStyle">
+    style="@style/VkListViewItemContainerStyle"
+    android:clickable="true"
+    android:background="@drawable/item_child_selector" >
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="85" >
+        android:layout_weight="85"
+        android:longClickable="false">
 
         <TextView
             android:id="@+id/title"

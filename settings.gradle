@@ -1,1 +1,1 @@
-include ':vksdk_library',':library',':mp3agic',':vkmusicsync'
+include ':slidingmenu_library', ':pulltorefresh_library', ':vksdk_library',':mp3agic',':vkmusicsync'

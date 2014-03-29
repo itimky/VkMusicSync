@@ -1,9 +1,11 @@
 package com.timky.vkmusicsync.helpers;
 
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 
-import com.timky.vkmusicsync.models.ListLoadEventListener;
+import com.timky.vkmusicsync.models.IAlbumListLoadListener;
+import com.timky.vkmusicsync.models.IAudioListLoadListener;
 import com.timky.vkmusicsync.models.TaskResult;
 import com.timky.vkmusicsync.models.VKAlbum;
 import com.timky.vkmusicsync.models.VKAlbumArray;
@@ -27,43 +29,65 @@ import java.util.List;
  */
 public class AudioListLoader extends AsyncTask<Void, Void, AudioListLoader.AudioListLoaderResult> {
 
-    public static long albumId;
+    private static long mAlbumId;
 
-    private static ListLoadEventListener mListLoadListener;
-    private static VKAlbumListAdapter mAlbumAdapter;
+    private static IAudioListLoadListener mAudioListLoadListener;
+    private static IAlbumListLoadListener mAlbumListLoadListener;
+    private static VKAlbumListAdapter mAlbumListAdapter;
     private static VKAudioListAdapter mAudioListAdapter;
     private static int mPageSize;
     private static int mCustomRefreshSize;
     private static int mOffset;
+    private static int mBackupOffset;
     private static boolean mIsAlbumMode;
     private static boolean mIsLoading;
 
-    public static void init(ListLoadEventListener listener, VKAlbumListAdapter albumAdapter, VKAudioListAdapter audioAdapter, int pageSize){
-        mListLoadListener = listener;
-        mAlbumAdapter = albumAdapter;
-        mAudioListAdapter = audioAdapter;
+    public static void initialize(int pageSize){
         mPageSize = pageSize;
         mCustomRefreshSize = 0;
         mOffset = 0;
+        mBackupOffset = 0;
         mIsAlbumMode = false;
         mIsLoading = false;
+        mAlbumId = 0;
+    }
 
-        albumId = 0;
+    public static void setAlbumSupport(VKAlbumListAdapter albumListAdapter, IAlbumListLoadListener albumListener){
+        mAlbumListAdapter = albumListAdapter;
+        mAlbumListLoadListener = albumListener;
+    }
+
+    public static void setAudioSupport(VKAudioListAdapter audioListAdapter, IAudioListLoadListener audioListener){
+        mAudioListAdapter = audioListAdapter;
+        mAudioListLoadListener = audioListener;
     }
 
     public static void loadAlbums(){
+        if (mAlbumListAdapter == null)
+            throw new NullPointerException("AlbumListAdapter has not been initialized");
+
         mIsAlbumMode = true;
         AudioListLoader loader = new AudioListLoader();
         loader.execute();
     }
 
     public static void refresh(){
+        checkAudioAdapter();
+
+        if (isLoading())
+            return;
+
         mOffset = 0;
         AudioListLoader loader = new AudioListLoader();
         loader.execute();
     }
 
     public static void refresh(int customRefreshSize){
+        checkAudioAdapter();
+
+        if (isLoading())
+            return;
+
         mCustomRefreshSize = customRefreshSize;
         mOffset = 0;
         AudioListLoader loader = new AudioListLoader();
@@ -71,25 +95,50 @@ public class AudioListLoader extends AsyncTask<Void, Void, AudioListLoader.Audio
     }
 
     public static void loadMore(){
+        checkAudioAdapter();
+
+        if (isLoading())
+            return;
+
         AudioListLoader loader = new AudioListLoader();
-        loader.execute();
+
+        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB )
+            loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+         else
+            loader.execute();
+    }
+
+    public static void setmAlbumId(long albumId) {
+        mAlbumId = albumId;
+
+        if (mAudioListLoadListener != null)
+            mAudioListLoadListener.onAlbumSelected();
+    }
+
+    private static void checkAudioAdapter(){
+        if (mAudioListAdapter == null)
+            throw new NullPointerException("AudioListAdapter has not been initialized");
+    }
+
+    private static boolean isLoading(){
+        return mIsLoading && !mIsAlbumMode;
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        if (mIsLoading || mAudioListAdapter.anyTask())
-            cancel(false);
-        else {
-            mIsLoading = true;
 
-            if (mListLoadListener != null)
-                if (mIsAlbumMode)
-                    mListLoadListener.onAlbumLoadStarted();
-                else
-                    mListLoadListener.onAudioLoadStarted(mOffset == 0);
+        mIsLoading = true;
+
+        if (mIsAlbumMode && mAlbumListLoadListener != null)
+            mAlbumListLoadListener.onListLoadStarted();
+        else
+        if (mAudioListLoadListener != null) {
+            if (mAudioListAdapter.anyTask() && mOffset == 0)
+                cancel(false);
+            else
+                mAudioListLoadListener.onListLoadStarted(mOffset == 0);
         }
-
     }
 
     /**
@@ -153,7 +202,7 @@ public class AudioListLoader extends AsyncTask<Void, Void, AudioListLoader.Audio
     private void loadAudioList(final AudioListLoaderResult result){
         int count = mCustomRefreshSize == 0 ? mPageSize : mCustomRefreshSize;
 
-        VKRequest request = new VKRequest("audio.get", VKParameters.from(VKApiConst.COUNT, count, VKApiConst.OFFSET, mOffset, VKApiConst.ALBUM_ID, albumId));
+        VKRequest request = new VKRequest("audio.get", VKParameters.from(VKApiConst.COUNT, count, VKApiConst.OFFSET, mOffset, VKApiConst.ALBUM_ID, mAlbumId));
         request.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
@@ -213,25 +262,27 @@ public class AudioListLoader extends AsyncTask<Void, Void, AudioListLoader.Audio
 
         mIsLoading = false;
 
-        if (mListLoadListener != null)
-            mListLoadListener.onLoadCanceled();
-        //mPullToRefreshView.onRefreshComplete();
+        if (mIsAlbumMode && mAlbumListLoadListener != null)
+            mAlbumListLoadListener.onListLoadStarted();
+        else if (mAudioListLoadListener != null)
+            mAudioListLoadListener.onListLoadCanceled();
+
+        mIsAlbumMode = false;
+        mOffset = mBackupOffset;
     }
-
-
 
     private void onAlbumLoadPostExecute(AudioListLoaderResult result){
         mIsAlbumMode = false;
 
         if (result.albumList != null)
-            mAlbumAdapter.refresh(result.albumList);
+            mAlbumListAdapter.refresh(result.albumList);
 
-        if (mListLoadListener != null)
-            mListLoadListener.onAlbumLoadFinished(result);
+        if (mAlbumListLoadListener != null)
+            mAlbumListLoadListener.onListLoadFinished(result);
     }
 
     private void onAudioLoadPostExecute(AudioListLoaderResult result){
-        if (result.audioInfoList != null && (result.audioInfoList.size() != 0 || albumId != 0))
+        if (result.audioInfoList != null && (result.audioInfoList.size() != 0 || mAlbumId != 0))
             if (mOffset == 0) {
                 mAudioListAdapter.refresh(result.audioInfoList);
                 mOffset = mCustomRefreshSize == 0 ? mPageSize : mCustomRefreshSize;
@@ -246,9 +297,10 @@ public class AudioListLoader extends AsyncTask<Void, Void, AudioListLoader.Audio
                 mAudioListAdapter.addAll(result.audioInfoList);
                 mOffset += mPageSize;
             }
+        mBackupOffset = mOffset;
 
-        if (mListLoadListener != null)
-            mListLoadListener.onAudioLoadFinished(result);
+        if (mAudioListLoadListener != null)
+            mAudioListLoadListener.onListLoadFinished(result);
     }
 
     class AudioListLoaderResult extends TaskResult {

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_album_list"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/list_padding"
+        android:paddingRight="@dimen/list_padding"
+        android:scrollbars="none"/>
+
+    <RelativeLayout
+        android:id="@+id/album_loading_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="gone">
+
+        <ProgressBar
+            style="@style/VkProgressBarStyle.Loading"/>
+
+    </RelativeLayout>
+
+
+</FrameLayout>

@@ -8,8 +8,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/library" />
             <option value="$PROJECT_DIR$/mp3agic" />
+            <option value="$PROJECT_DIR$/pulltorefresh_library" />
+            <option value="$PROJECT_DIR$/slidingmenu_library" />
             <option value="$PROJECT_DIR$/vkmusicsync" />
             <option value="$PROJECT_DIR$/vksdk_library" />
           </set>

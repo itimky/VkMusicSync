@@ -2,7 +2,7 @@ apply plugin: 'android'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.3"
+    buildToolsVersion '19.0.3'
 
     defaultConfig {
         minSdkVersion 8
@@ -20,8 +20,10 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:+'
+    compile 'com.android.support:support-v4:+'
     compile project(':vksdk_library')
-    compile project(':library')
     compile project(':mp3agic')
+    compile project(':slidingmenu_library')
+    compile project(':pulltorefresh_library')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }

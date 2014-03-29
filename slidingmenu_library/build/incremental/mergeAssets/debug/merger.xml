@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger>
+
+    <dataSet config="main" >
+        <source path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/assets" />
+    </dataSet>
+    <dataSet config="debug" >
+        <source path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/debug/assets" />
+    </dataSet>
+
+</merger>

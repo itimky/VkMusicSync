@@ -72,8 +72,9 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="appcompat-v7-19.0.1" level="project" />
     <orderEntry type="library" exported="" name="support-v4-19.0.1" level="project" />
-    <orderEntry type="module" module-name="library" exported="" />
+    <orderEntry type="module" module-name="pulltorefresh_library" exported="" />
     <orderEntry type="module" module-name="vksdk_library" exported="" />
+    <orderEntry type="module" module-name="slidingmenu_library" exported="" />
     <orderEntry type="module" module-name="mp3agic" exported="" />
   </component>
 </module>

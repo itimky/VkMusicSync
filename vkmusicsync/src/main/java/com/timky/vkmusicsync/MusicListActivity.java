@@ -3,18 +3,17 @@ package com.timky.vkmusicsync;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.os.Build;
+
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
+
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.TranslateAnimation;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -22,72 +21,53 @@ import android.widget.Toast;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 import com.timky.vkmusicsync.helpers.AudioListLoader;
 import com.timky.vkmusicsync.helpers.Downloader;
-import com.timky.vkmusicsync.helpers.VKAlbumListAdapter;
 import com.timky.vkmusicsync.helpers.VKAudioListAdapter;
-import com.timky.vkmusicsync.models.AlbumSelectedListener;
-import com.timky.vkmusicsync.models.ListLoadEventListener;
+import com.timky.vkmusicsync.models.IAudioListLoadListener;
 import com.timky.vkmusicsync.models.TaskResult;
-import com.timky.vkmusicsync.models.VKAlbum;
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKSdk;
 
 import java.io.File;
 
-public class MusicListActivity extends ActionBarActivity implements ListLoadEventListener, AlbumSelectedListener {
+public class MusicListActivity extends SlidingFragmentActivity implements IAudioListLoadListener{
+
     public static final int pageSize = 20;
 
     private PullToRefreshListView mPullToRefreshView;
-    private VKAudioListAdapter mAudioAdapter;
-    private VKAlbumListAdapter mAlbumAdapter;
+    private VKAudioListAdapter mAudioListAdapter;
     private RelativeLayout mAudioLoadingLayout;
-    private RelativeLayout mAlbumLoadingLayout;
-    private ActionBarDrawerToggle mDrawerToggle;
-    private FrameLayout mFrame;
-    private ListView mDrawerList;
+    private SlidingMenu mMenu;
     private String mFilePath = "Music/";      // Slash is required
     private int mForceSyncCount = 0;
-    private float lastTranslate = 0.0f;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_music_list);
-        initialize();
         removeTempFile();
-        mAudioLoadingLayout.setVisibility(View.VISIBLE);
-        AudioListLoader.loadAlbums();
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle.syncState();
+        initialize();
+        AudioListLoader.initialize(pageSize);
+        AudioListLoader.setAudioSupport(mAudioListAdapter, this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mAudioAdapter.cancelAllTasks();
+        mAudioListAdapter.cancelAllTasks();
         removeTempFile();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        mAudioAdapter.notifyDataSetChanged();
-        mDrawerToggle.onConfigurationChanged(newConfig);
+        mAudioListAdapter.notifyDataSetChanged();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-
         int id = item.getItemId();
 
         switch (id){
@@ -104,6 +84,11 @@ public class MusicListActivity extends ActionBarActivity implements ListLoadEven
                     startLoginActivity();
                 }
                 return true;
+
+            case android.R.id.home:         // Slide menu
+                mMenu.toggle(true);
+                return true;
+
 
             case R.id.sync_first_100:
                 mForceSyncCount = 100;
@@ -123,80 +108,59 @@ public class MusicListActivity extends ActionBarActivity implements ListLoadEven
         return true;
     }
 
+    @Override
+    public void onBackPressed(){
+        if(mMenu.isMenuShowing()){  // if SlidingMenu is opened
+            mMenu.toggle(true);     // close SlidingMenu
+            return;
+        }
+
+        super.onBackPressed();
+    }
+
     private void initialize(){
         setContentView(R.layout.activity_music_list);
+        mAudioListAdapter = new VKAudioListAdapter(this, mFilePath);
+        mAudioLoadingLayout = (RelativeLayout)findViewById(R.id.audio_loading_layout);
+        initializePullToRefresh();
+        initializeSlidingMenu();
+    }
 
-        DrawerLayout drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        drawerLayout.setScrimColor(getResources().getColor(android.R.color.transparent));
-        mAudioAdapter = new VKAudioListAdapter(this, mFilePath);
-        mAlbumAdapter = new VKAlbumListAdapter(this, drawerLayout);
-        mAlbumAdapter.onAlbumSelectedListener = this;
-        AudioListLoader.init(this, mAlbumAdapter, mAudioAdapter, pageSize);
+    private void initializeSlidingMenu(){
+        setBehindContentView(R.layout.fragment_album_list);
+        FragmentTransaction t = this.getSupportFragmentManager().beginTransaction();
+        Fragment fragment = new AlbumMenuFragment();
+        t.replace(R.id.fragment_album_list, fragment);
+        t.commit();
 
+        mMenu = getSlidingMenu();
+        mMenu.setShadowWidthRes(R.dimen.shadow_width);
+        mMenu.setShadowDrawable(R.drawable.shadow);
+        mMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+        mMenu.setFadeDegree(0.35f);
+        mMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void initializePullToRefresh(){
         mPullToRefreshView = (PullToRefreshListView) findViewById(R.id.pull_to_refresh_listview);
         mPullToRefreshView.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<ListView>() {
             @Override
             public void onRefresh(PullToRefreshBase<ListView> refreshView) {
-                AudioListLoader.refresh();
+                    AudioListLoader.refresh();
             }
         });
 
         mPullToRefreshView.setOnLastItemVisibleListener(new PullToRefreshBase.OnLastItemVisibleListener() {
             @Override
             public void onLastItemVisible() {
-                    AudioListLoader.loadMore();
-                }
+                AudioListLoader.loadMore();
+            }
         });
 
-        mPullToRefreshView.setAdapter(mAudioAdapter);
+        mPullToRefreshView.setAdapter(mAudioListAdapter);
         mPullToRefreshView.getFooterLoadingView().refreshing();
-
-        mAlbumLoadingLayout = (RelativeLayout)findViewById(R.id.album_loading_layout);
-        mAudioLoadingLayout = (RelativeLayout)findViewById(R.id.audio_loading_layout);
-
-        mFrame = (FrameLayout) findViewById(R.id.main_frame);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
-
-        mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close)
-        {
-            //@SuppressLint("NewApi")
-            public void onDrawerSlide(View drawerView, float slideOffset)
-            {
-                float moveFactor = (mDrawerList.getWidth() * slideOffset);
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-                {
-                    mFrame.setTranslationX(moveFactor);
-                }
-                else
-                {
-                    TranslateAnimation anim = new TranslateAnimation(lastTranslate, moveFactor, 0.0f, 0.0f);
-                    anim.setDuration(0);
-                    anim.setFillAfter(true);
-                    mFrame.startAnimation(anim);
-
-                    lastTranslate = moveFactor;
-                }
-            }
-        };
-
-        mDrawerList.setAdapter(mAlbumAdapter);
-
-//        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long album_id) {
-//                VKAlbum album = (VKAlbum)parent.getItemAtPosition(position);
-//                if (AudioListLoader.albumId == album.album_id)
-//                    return;
-//
-//                AudioListLoader.albumId = album.album_id;
-//                AudioListLoader.refresh();
-//            }
-//        });
-
-        drawerLayout.setDrawerListener(mDrawerToggle);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
     }
 
     private void startLoginActivity() {
@@ -214,24 +178,7 @@ public class MusicListActivity extends ActionBarActivity implements ListLoadEven
     }
 
     @Override
-    public void onAlbumLoadStarted() {
-        //mAlbumLoadingLayout.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onAlbumLoadFinished(TaskResult result) {
-        if (result.errorMessage != null)
-            Toast.makeText(getApplicationContext(), result.errorMessage,
-                    Toast.LENGTH_SHORT).show();
-        else {
-            mAlbumLoadingLayout.setVisibility(View.GONE);
-            AudioListLoader.refresh();
-        }
-
-    }
-
-    @Override
-    public void onAudioLoadStarted(boolean fullRefresh) {
+    public void onListLoadStarted(boolean fullRefresh) {
         if (!fullRefresh) {
             mPullToRefreshView.getFooterLoadingView().setVisibility(View.VISIBLE);
 
@@ -240,15 +187,25 @@ public class MusicListActivity extends ActionBarActivity implements ListLoadEven
                 listView.setSelection(listView.getCount() - 1);
             }
         }
+        else if (!mPullToRefreshView.isRefreshing())
+            mAudioLoadingLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void onLoadCanceled() {
+    public void onAlbumSelected() {
+        AudioListLoader.refresh();
+
+        if (mMenu.isMenuShowing())
+            mMenu.toggle(true);
+    }
+
+    @Override
+    public void onListLoadCanceled() {
         finishLoading();
     }
 
     @Override
-    public void onAudioLoadFinished(TaskResult result) {
+    public void onListLoadFinished(TaskResult result) {
         finishLoading();
 
         if (result.errorMessage != null)
@@ -256,7 +213,7 @@ public class MusicListActivity extends ActionBarActivity implements ListLoadEven
                     Toast.LENGTH_SHORT).show();
 
         else if (mForceSyncCount != 0) {
-            mAudioAdapter.forceSync(mForceSyncCount);
+            mAudioListAdapter.forceSync(mForceSyncCount);
             mForceSyncCount = 0;
         }
     }
@@ -264,29 +221,8 @@ public class MusicListActivity extends ActionBarActivity implements ListLoadEven
     private void finishLoading(){
         mPullToRefreshView.onRefreshComplete();
         mPullToRefreshView.getFooterLoadingView().setVisibility(View.GONE);
-        mAlbumLoadingLayout.setVisibility(View.GONE);
         mAudioLoadingLayout.setVisibility(View.GONE);
     }
-
-    @Override
-    public void onAlbumSelected(VKAlbum album) {
-        if (AudioListLoader.albumId == album.album_id)
-            return;
-
-        mAudioLoadingLayout.setVisibility(View.VISIBLE);
-        AudioListLoader.albumId = album.album_id;
-        AudioListLoader.refresh();
-    }
-
-//    @Override
-//    public void onAlbumSelected(VKAlbum album) {
-//        if (AudioListLoader.albumId == album.album_id)
-//            return;
-//
-//        AudioListLoader.albumId = album.album_id;
-//        AudioListLoader.refresh();
-//    }
-
 
 //    /**
 //     * A placeholder fragment containing a simple view.

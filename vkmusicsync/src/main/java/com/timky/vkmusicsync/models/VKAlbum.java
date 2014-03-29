@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by timky on 25.03.14.
  */
-public class VKAlbum extends VKApiModel {
+public class VKAlbum extends VKApiModel implements Comparable {
     public long album_id;       // Album id
     public long owner_id;       // Owner Id
     public String title;        // Album title
@@ -20,5 +20,25 @@ public class VKAlbum extends VKApiModel {
             result.add(albumArray.get(i));
 
         return result;
+    }
+
+    private boolean mIsSelected = false;
+    public boolean isSelected(){
+        return mIsSelected;
+    }
+
+    public void setIsSelected(boolean isSelected){
+        mIsSelected = isSelected;
+
+        if (listener != null){
+            listener.onAlbumSelected(isSelected);
+        }
+    }
+
+    public IAlbumSelectedListener listener;
+
+    @Override
+    public int compareTo(Object another) {
+        return title.compareTo(((VKAlbum)another).title);
     }
 }

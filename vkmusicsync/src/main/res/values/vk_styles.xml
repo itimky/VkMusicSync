@@ -9,16 +9,12 @@
     </style>
 
     <style name="VKListViewStyle">
-        <item name="android:divider">@color/VkDarkColor</item>
-        <item name="android:dividerHeight">1px</item>
-    </style>
-
-    <style name="VKListViewStyle.Navigation">
-        <item name="android:layout_width">240dp</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:layout_gravity">start</item>
-        <item name="android:choiceMode">singleChoice</item>
-
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+        <!--<item name="android:paddingLeft">@dimen/activity_horizontal_margin</item>-->
+        <!--<item name="android:paddingRight">@dimen/activity_horizontal_margin</item>-->
+        <!--<item name="android:divider">@color/VkDarkColor</item>-->
+        <!--<item name="android:dividerHeight">1px</item>-->
     </style>
 
     <style name="VKListViewStyle.PullToRefresh">
@@ -36,20 +32,17 @@
         <item name="android:baselineAligned">true</item>
     </style>
 
+    <style name="VKTextViewStyle">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
     <style name="VkListViewItemTextViewStyle">
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginLeft">10dp</item>
         <item name="android:textSize">24sp</item>
-    </style>
-
-    <style name="VkListViewItemTextViewStyle.Header">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:layout_marginBottom">4dp</item>
-        <item name="android:textColor">@color/vk_color</item>
-        <item name="android:layout_alignParentBottom">true</item>
     </style>
 
     <style name="VkListViewItemTextViewStyle.SubTitle">
@@ -58,10 +51,17 @@
 
     <style name="VkListViewItemTextViewStyle.Progress">
         <item name="android:textSize">16sp</item>
+        <item name="android:visibility">gone</item>
         <item name="android:gravity">center</item>
     </style>
 
+    <style name="VkListViewItemTextViewStyle.AlbumMainElement">
+        <!--<item name="android:layout_marginLeft">5dp</item>-->
+    </style>
+
     <style name="VkListViewItemTextViewStyle.AlbumTitle">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">20sp</item>
         <item name="android:layout_height">40dp</item>
     </style>
 
@@ -85,7 +85,41 @@
         <item name="android:progressDrawable">@drawable/custom_progressbar</item>
     </style>
 
+    <style name="VkTextViewButtonStyle">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="VkHeader">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:textColor">@color/vk_color</item>
+        <item name="android:focusableInTouchMode">false</item>
+        <!--<item name="android:layout_alignParentBottom">true</item>-->
+    </style>
+
+    <style name="VkHeaderSeparator">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">2dp</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:background">@color/vk_color</item>
+        <item name="android:focusableInTouchMode">false</item>
+    </style>
+
+    <style name="VkAlbumMenuStyle">
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:weightSum">100</item>
+    </style>
+
     <color name="VkDarkColor">#111111</color>
+    <color name="transparent">#00000000</color>
     <!--<color name="VkLightBlueColor">#55B5BC</color>-->
 
 </resources>

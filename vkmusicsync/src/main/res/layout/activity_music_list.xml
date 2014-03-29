@@ -1,41 +1,13 @@
-<android.support.v4.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/drawer_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/main_frame"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="com.example.vkmusicsync.MusicListActivity"
-        tools:ignore="MergeRootFrame">
+        android:layout_height="match_parent" >
 
         <com.handmark.pulltorefresh.library.PullToRefreshListView
             android:id="@+id/pull_to_refresh_listview"
-
-            style="@style/VKListViewStyle.PullToRefresh"/>
-
-        <RelativeLayout
-            android:id="@+id/audio_loading_layout"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:visibility="gone">
-
-            <ProgressBar
-                style="@style/VkProgressBarStyle.Loading"/>
-
-        </RelativeLayout>
-    </FrameLayout>
-
-    <ListView
-        android:id="@+id/left_drawer"
-        style="@style/VKListViewStyle.Navigation"/>
-
+            style="@style/VKListViewStyle.PullToRefresh" />
 
     <RelativeLayout
-        android:id="@+id/album_loading_layout"
+        android:id="@+id/audio_loading_layout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:visibility="gone">
@@ -45,4 +17,4 @@
 
     </RelativeLayout>
 
-</android.support.v4.widget.DrawerLayout>
+</FrameLayout>
