@@ -14,7 +14,7 @@
 
     <string name="app_name">VkMusicSync</string>
 
-    <string name="audio_list_item_progress_state_template" formatted="false">%.2f Мб / %.2f Мб</string>
+    <string name="audio_list_item_progress_template" formatted="false">%.2f Мб / %.2f Мб</string>
 
     <string name="dialog_cancel">Отмена</string>
     <string name="dialog_no">Нет</string>
@@ -27,6 +27,12 @@
     <string name="message_cancel_all_downloads">Отменить все загрузки?</string>
     <string name="message_cancel_download">Отменить загрузку?</string>
     <string name="message_sync_first_n">Введите количество песен.\n(0 - скачать все свои аудиозаписи, может занять много времени)</string>
+
+    <string name="notification_download_all_complete_template" formatted="false">Все загрузки завершены (%d / %d)</string>
+    <string name="notification_download_canceled">Загрузка отменена</string>
+    <string name="notification_download_complete">Загрузка завершена</string>
+    <string name="notification_download_error">Ошибка загрузки</string>
+    <string name="notification_progress_template" formatted="false">%.2f Мб / %.2f Мб (%d / %d)</string>
 
     <string name="title_activity_login">Вход</string>
 

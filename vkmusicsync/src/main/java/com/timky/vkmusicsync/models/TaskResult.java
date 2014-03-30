@@ -17,7 +17,7 @@ public class TaskResult {
     public void handleError(Context context){
         if (errorMessage != null)
             switch (errorCode) {
-                case ErrorCodes.needReLogin:
+                case ErrorCodes.wrongTokenIp:
                     LoginActivity.reLogin(context);
                     break;
                 case ErrorCodes.connectionRefused:

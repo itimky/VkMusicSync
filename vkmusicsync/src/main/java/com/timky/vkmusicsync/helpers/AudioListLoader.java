@@ -198,7 +198,6 @@ public class AudioListLoader extends AsyncTask<Void, Void, AudioListLoader.Audio
 
                 result.errorMessage = message;
                 result.errorCode = error.errorCode;
-                updateError(result);
             }
         });
     }
@@ -243,7 +242,6 @@ public class AudioListLoader extends AsyncTask<Void, Void, AudioListLoader.Audio
 
                 result.errorMessage = message;
                 result.errorCode = error.errorCode;
-                updateError(result);
             }
         });
     }
@@ -316,16 +314,6 @@ public class AudioListLoader extends AsyncTask<Void, Void, AudioListLoader.Audio
 
         if (mAudioListLoadListener != null)
             mAudioListLoadListener.onListLoadFinished(result);
-    }
-
-    private static void updateError(TaskResult result){
-        if (result.errorCode == ErrorCodes.wrongTokenIp) {
-            result.errorMessage = "Need re-login";
-            result.errorCode = ErrorCodes.needReLogin;
-        }
-        else if (result.errorCode == ErrorCodes.connectionRefused ) {
-            result.errorMessage = "No internet access";
-        }
     }
 
     class AudioListLoaderResult extends TaskResult {

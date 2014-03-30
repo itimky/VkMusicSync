@@ -3,6 +3,7 @@ package com.timky.vkmusicsync.helpers;
 import android.os.AsyncTask;
 import android.os.Environment;
 
+import com.timky.vkmusicsync.models.ErrorCodes;
 import com.timky.vkmusicsync.models.TaskResult;
 import com.timky.vkmusicsync.models.Downloadable;
 
@@ -11,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.UnknownHostException;
 import java.util.List;
 
 /**
@@ -44,6 +46,8 @@ public class Downloader extends AsyncTask<Object, Integer, TaskResult> {
 
         if (isCancelled())
             return result;
+
+        mDownloadable.startDownload();
 
         String directoryPath = Environment.getExternalStorageDirectory().getPath() + "/" + mFilePath;
         String fileName = mUseTempName ? "vk_sync.tmp" : mDownloadable.getFileName() + mPostfix;
@@ -110,6 +114,10 @@ public class Downloader extends AsyncTask<Object, Integer, TaskResult> {
             fileOutput.close();
             result.fullFileName = directoryPath + fileName;
 
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            result.errorMessage = "No internet access...";
+            result.errorCode = ErrorCodes.connectionRefused;
         } catch (IOException e) {
             e.printStackTrace();
             result.errorMessage = "IOException...";
@@ -121,7 +129,7 @@ public class Downloader extends AsyncTask<Object, Integer, TaskResult> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        this.mDownloadable.setDownloading(true);
+        mDownloadable.prepareDownload();
     }
 
     @Override
@@ -129,7 +137,7 @@ public class Downloader extends AsyncTask<Object, Integer, TaskResult> {
         super.onProgressUpdate(progress);
         double downloaded = (double) progress[0] / 1000000;
         double total = (double) progress[1] / 1000000;
-        this.mDownloadable.setProgress(downloaded, total);
+        mDownloadable.setProgress(downloaded, total);
     }
 
     @Override
@@ -139,21 +147,21 @@ public class Downloader extends AsyncTask<Object, Integer, TaskResult> {
         // IsDownloading must be true to refresh sd-card media
         checkIsDownloaded(this.mDownloadable, mFilePath);
 
-        this.mDownloadable.setDownloading(false);
-
         if (result.errorMessage != null)
-            this.mDownloadable.raiseError(result.errorMessage);
+            mDownloadable.raiseError(result);
+        else
+            mDownloadable.completeDownload();
 
-        this.mDownloadable.task = null;
+        mDownloadable.task = null;
     }
 
     @Override
     protected void onCancelled() {
         super.onCancelled();
         // Setting IsDownloading = false to aviod sd-card media refresh
-        this.mDownloadable.setDownloading(false);
-        checkIsDownloaded(this.mDownloadable, mFilePath);
-        this.mDownloadable.task = null;
+        mDownloadable.cancelDownload();
+        checkIsDownloaded(mDownloadable, mFilePath);
+        mDownloadable.task = null;
     }
 
     public static void checkIsDownloaded(Downloadable downloadable, String filePath){

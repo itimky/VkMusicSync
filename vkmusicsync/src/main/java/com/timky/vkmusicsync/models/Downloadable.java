@@ -2,11 +2,12 @@ package com.timky.vkmusicsync.models;
 
 import android.os.Environment;
 
-import com.timky.vkmusicsync.helpers.AudioDownloader;
 import com.timky.vkmusicsync.helpers.Downloader;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by timky on 21.03.14.
@@ -23,7 +24,7 @@ public abstract class Downloadable {
         return fullFileName;
     }
 
-    public DownloadEventListener downloadListener;
+    private final List<IDownloadListener> mDownloadListenerList = new ArrayList<IDownloadListener>();
     public Downloader task;
     private boolean isDownloaded = false;
     private boolean isDownloading = false;
@@ -47,24 +48,48 @@ public abstract class Downloadable {
     public void setDownloaded(boolean isDownloaded, String fullFilePath) {
         this.isDownloaded = isDownloaded;
 
-        if (downloadListener != null)
-            downloadListener.onDownloadedChanged(isDownloaded, fullFilePath);
+        for (IDownloadListener listener : mDownloadListenerList)
+            listener.onDownloadedChanged(isDownloaded, fullFilePath);
     }
 
     public boolean isDownloading() {
         return isDownloading;
     }
 
-    public void setDownloading(boolean isDownloading) {
-        this.isDownloading = isDownloading;
+    public void prepareDownload(){
+        isDownloading = true;
+        downloadedSize = 0;
+        totalSize = 0;
 
-        if (isDownloading){
-            downloadedSize = 0;
-            totalSize = 0;
-        }
+        // toList is needed to prevent exception if
+        // one of subscribers will unsubscribe before iteration end
+        for (IDownloadListener listener : toList(mDownloadListenerList))
+            listener.onDownloadPrepare(this);
+    }
 
-        if (downloadListener != null)
-            downloadListener.onDownloadingChanged(isDownloading);
+    public void startDownload(){
+        // toList is needed to prevent exception if
+        // one of subscribers will unsubscribe before iteration end
+        for (IDownloadListener listener :toList(mDownloadListenerList))
+            listener.onDownloadBegin(this);
+    }
+
+    public void completeDownload(){
+        finishDownload();
+
+        // toList is needed to prevent exception if
+        // one of subscribers will unsubscribe before iteration end
+        for (IDownloadListener listener : toList(mDownloadListenerList))
+            listener.onDownloadComplete(this);
+    }
+
+    public void cancelDownload(){
+        finishDownload();
+
+        // toList is needed to prevent exception if
+        // one of subscribers will unsubscribe before iteration end
+        for (IDownloadListener listener : toList(mDownloadListenerList))
+            listener.onDownloadCancel(this);
     }
 
     public double getDownloadedSize() {
@@ -74,8 +99,10 @@ public abstract class Downloadable {
     public void setDownloadedSize(double downloadedSize) {
         this.downloadedSize = downloadedSize;
 
-        if (downloadListener != null)
-            downloadListener.onProgressChanged(downloadedSize, this.totalSize);
+        // toList is needed to prevent exception if
+        // one of subscribers will unsubscribe before iteration end
+        for (IDownloadListener listener : toList(mDownloadListenerList))
+            listener.onProgressChanged(downloadedSize, this.totalSize);
     }
 
     public double getTotalSize() {
@@ -85,16 +112,26 @@ public abstract class Downloadable {
     public void setTotalSize(double totalSize) {
         this.totalSize = totalSize;
 
-        if (downloadListener != null)
-            downloadListener.onProgressChanged(this.downloadedSize, totalSize);
+        // toList is needed to prevent exception if
+        // one of subscribers will unsubscribe before iteration end
+        for (IDownloadListener listener : toList(mDownloadListenerList))
+            listener.onProgressChanged(this.downloadedSize, totalSize);
     }
 
     public void setProgress(double downloadedSize, double totalSize){
         this.downloadedSize = downloadedSize;
         this.totalSize = totalSize;
 
-        if (downloadListener != null)
-            downloadListener.onProgressChanged(downloadedSize, totalSize);
+        // toList is needed to prevent exception if
+        // one of subscribers will unsubscribe before iteration end
+        for (IDownloadListener listener : toList(mDownloadListenerList))
+            listener.onProgressChanged(downloadedSize, totalSize);
+    }
+
+    public static <T> List<T> toList(List<T> list){
+        List<T> result = new ArrayList<T>(list);
+
+        return result;
     }
 
 //    public String getFileFullPath() {
@@ -104,9 +141,26 @@ public abstract class Downloadable {
         return url;
     }
 
-    public void raiseError(String errorMessage){
-        if (downloadListener != null)
-            downloadListener.onDownloadError(errorMessage);
+    public void raiseError(TaskResult result){
+        finishDownload();
+
+        // toList is needed to prevent exception if
+        // one of subscribers will unsubscribe before iteration end
+        for (IDownloadListener listener : toList(mDownloadListenerList))
+            listener.onDownloadError(result);
     }
+
+    public void subscribe(IDownloadListener listener){
+        mDownloadListenerList.add(listener);
+    }
+
+    public void unsubscribe(IDownloadListener listener){
+        mDownloadListenerList.remove(listener);
+    }
+
+    private void finishDownload() {
+        isDownloading = false;
+    }
+
     //[\]\[|\\?*<":>+/']
 }

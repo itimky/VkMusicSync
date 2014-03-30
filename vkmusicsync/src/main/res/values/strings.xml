@@ -14,7 +14,7 @@
 
     <string name="app_name">VkMusicSync</string>
 
-    <string name="audio_list_item_progress_state_template" formatted="false">%.2f Mb / %.2f Mb</string>
+    <string name="audio_list_item_progress_template" formatted="false">%.2f Mb / %.2f Mb</string>
 
     <string name="dialog_cancel">Cancel</string>
     <string name="dialog_no">No</string>
@@ -27,6 +27,12 @@
     <string name="message_cancel_all_downloads">Cancel all downloads?</string>
     <string name="message_cancel_download">Cancel download?</string>
     <string name="message_sync_first_n">Type number of songs.\n(0 - download all of your music, may take a long time)</string>
+
+    <string name="notification_download_all_complete_template" formatted="false">All downloads complete (%d / %d)</string>
+    <string name="notification_download_canceled">Download canceled</string>
+    <string name="notification_download_complete">Download complete</string>
+    <string name="notification_download_error">Download error</string>
+    <string name="notification_progress_template" formatted="false">%.2f Mb / %.2f Mb (%d / %d)</string>
 
     <string name="title_activity_login">Login</string>
 

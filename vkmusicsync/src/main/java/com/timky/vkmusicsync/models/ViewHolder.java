@@ -14,7 +14,7 @@ import com.timky.vkmusicsync.R;
 /**
  * Created by timky on 14.03.14.
  */
-public class ViewHolder implements DownloadEventListener {
+public class ViewHolder implements IDownloadListener {
 
     protected final Context mContext;
     public final TextView artist;
@@ -38,9 +38,9 @@ public class ViewHolder implements DownloadEventListener {
     }
 
     public void setAudioInfo(VKAudioInfo audioInfo){
-        // If audioInfo (ai) != null - desubscribe
+        // If audioInfo (ai) != null - unsubscribe
         if (this.audioInfo != null)
-            this.audioInfo.downloadListener = null;
+            this.audioInfo.unsubscribe(this);
 
         this.audioInfo = audioInfo;
 
@@ -61,26 +61,54 @@ public class ViewHolder implements DownloadEventListener {
         barProgress.setVisibility(downloading);
         textProgress.setVisibility(downloading);
         downloaded.setVisibility(isDownloaded);
-        audioInfo.downloadListener = this;
+        audioInfo.subscribe(this);
+    }
+
+//    @Override
+//    public void onDownloadingChanged(Downloadable downloadable) {
+//        boolean isDownloading = downloadable.isDownloading();
+//        int visibility = isDownloading ? View.VISIBLE : View.GONE;
+//
+//        barProgress.setProgress(0);
+//        barProgress.setVisibility(visibility);
+//        barProgress.setIndeterminate(isDownloading);
+//
+//        textProgress.setVisibility(visibility);
+//        textProgress.setText("");
+//    }
+
+    @Override
+    public void onDownloadPrepare(Downloadable downloadable) {
+        barProgress.setProgress(0);
+        barProgress.setVisibility(View.VISIBLE);
+        barProgress.setIndeterminate(true);
+
+        textProgress.setVisibility(View.VISIBLE);
+        textProgress.setText(
+                mContext.getString(R.string.audio_list_item_progress_template,
+                                downloadable.getDownloadedSize(), downloadable.getTotalSize()));
     }
 
     @Override
-    public void onDownloadingChanged(boolean isDownloading) {
-        int visibility = isDownloading ? View.VISIBLE : View.GONE;
+    public void onDownloadBegin(Downloadable downloadable) {
 
-        barProgress.setProgress(0);
-        barProgress.setVisibility(visibility);
-        barProgress.setIndeterminate(isDownloading);
+    }
 
-        textProgress.setVisibility(visibility);
-        textProgress.setText("");
+    @Override
+    public void onDownloadComplete(Downloadable downloadable) {
+        completeDownload();
+    }
+
+    @Override
+    public void onDownloadCancel(Downloadable downloadable) {
+        completeDownload();
     }
 
     @Override
     public void onProgressChanged(double downloadedSize, double totalSize) {
         barProgress.setIndeterminate(false);
         barProgress.setProgress((int)(downloadedSize  * 100 / totalSize));
-        textProgress.setText(mContext.getString(R.string.audio_list_item_progress_state_template, downloadedSize, totalSize));
+        textProgress.setText(mContext.getString(R.string.audio_list_item_progress_template, downloadedSize, totalSize));
     }
 
     @Override
@@ -94,8 +122,17 @@ public class ViewHolder implements DownloadEventListener {
     }
 
     @Override
-    public void onDownloadError(String errorMessage) {
-        Toast.makeText(mContext, errorMessage,
-                Toast.LENGTH_SHORT).show();
+    public void onDownloadError(TaskResult result) {
+        completeDownload();
+        result.handleError(mContext);
+    }
+
+    private void completeDownload(){
+        barProgress.setProgress(0);
+        barProgress.setVisibility(View.GONE);
+        barProgress.setIndeterminate(true);
+
+        textProgress.setVisibility(View.GONE);
+        textProgress.setText("");
     }
 }
