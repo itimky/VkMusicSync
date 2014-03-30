@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="mp3agic">
-    <CLASSES>
-      <root url="file://$PROJECT_DIR$/vkmusicsync/external/mp3agic" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
