@@ -74,4 +74,7 @@ public abstract class VKSdkListener {
 	public void onRenewAccessToken(VKAccessToken token) {
 	}
 
+    public abstract void onAuthDecline();
+
+
 }

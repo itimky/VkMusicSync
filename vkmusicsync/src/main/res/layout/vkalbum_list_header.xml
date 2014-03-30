@@ -8,7 +8,7 @@
     android:clickable="true">
 
     <TextView
-        android:text="@string/playlists"
+        android:text="@string/album_list_item_playlists"
         android:textAllCaps="true"
         android:layout_height="40dp"
         android:gravity="bottom"

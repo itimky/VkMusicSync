@@ -2,4 +2,4 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/content_frame"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" /><!-- From: file:/C:/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/layout/responsive_content_frame.xml -->
+    android:layout_height="match_parent" /><!-- From: file:/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/layout/responsive_content_frame.xml -->

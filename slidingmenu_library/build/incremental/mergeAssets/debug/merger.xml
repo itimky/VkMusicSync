@@ -2,7 +2,7 @@
 <merger>
 
     <dataSet config="main" >
-        <source path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/assets" />
+        <source path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/assets" />
     </dataSet>
     <dataSet config="debug" >
         <source path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/debug/assets" />

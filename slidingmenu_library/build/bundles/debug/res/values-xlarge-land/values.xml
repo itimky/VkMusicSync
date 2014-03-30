@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- From: file:/C:/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values-xlarge-land/dimens.xml -->
+    <!-- From: file:/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values-xlarge-land/dimens.xml -->
     <eat-comment />
 
     <dimen name="slidingmenu_offset">750dp</dimen>

@@ -36,7 +36,7 @@ public class VKAlbumListAdapter extends BaseAdapter {
 
         VKAlbum myMusic = new VKAlbum();                            // Menu item "My music" -> selects all music from all albums
         myMusic.album_id = ListViewItemKind.MyMusic;
-        myMusic.title = context.getString(R.string.my_music);
+        myMusic.title = context.getString(R.string.album_list_item_my_music);
         myMusic.setIsSelected(true);
         this.albumList.add(myMusic);
 

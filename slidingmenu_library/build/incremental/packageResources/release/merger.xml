@@ -2,49 +2,49 @@
 <merger>
 
     <dataSet config="main" >
-        <source path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res" >
+        <source path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res" >
             <file
                 name="menu_frame_two"
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/layout/menu_frame_two.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/layout/menu_frame_two.xml"
                 qualifiers=""
                 type="layout" />
             <file
                 name="responsive_content_frame"
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/layout/responsive_content_frame.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/layout/responsive_content_frame.xml"
                 qualifiers=""
                 type="layout" />
             <file
                 name="slidingmenumain"
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/layout/slidingmenumain.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/layout/slidingmenumain.xml"
                 qualifiers=""
                 type="layout" />
             <file
                 name="list_grid"
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/layout/list_grid.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/layout/list_grid.xml"
                 qualifiers=""
                 type="layout" />
             <file
                 name="properties"
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/layout/properties.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/layout/properties.xml"
                 qualifiers=""
                 type="layout" />
             <file
                 name="content_frame"
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/layout/content_frame.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/layout/content_frame.xml"
                 qualifiers=""
                 type="layout" />
             <file
                 name="pager"
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/layout/pager.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/layout/pager.xml"
                 qualifiers=""
                 type="layout" />
             <file
                 name="list"
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/layout/list.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/layout/list.xml"
                 qualifiers=""
                 type="layout" />
             <file
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values-xlarge-land/dimens.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values-xlarge-land/dimens.xml"
                 qualifiers="xlarge-land" >
                 <integer name="num_cols" >
 3
@@ -54,7 +54,7 @@
                 </dimen>
             </file>
             <file
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values-land/dimens.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values-land/dimens.xml"
                 qualifiers="land" >
                 <integer name="num_cols" >
 2
@@ -65,16 +65,16 @@
             </file>
             <file
                 name="shadowright"
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/drawable/shadowright.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/drawable/shadowright.xml"
                 qualifiers=""
                 type="drawable" />
             <file
                 name="shadow"
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/drawable/shadow.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/drawable/shadow.xml"
                 qualifiers=""
                 type="drawable" />
             <file
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values/colors.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values/colors.xml"
                 qualifiers="" >
                 <color name="blue" >#009
                 </color>
@@ -88,7 +88,7 @@
                 </color>
             </file>
             <file
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values/attrs.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values/attrs.xml"
                 qualifiers="" >
                 <declare-styleable name="SlidingMenu" >
                     <attr name="mode" >
@@ -157,7 +157,7 @@
                 </declare-styleable>
             </file>
             <file
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values/strings.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values/strings.xml"
                 qualifiers="" >
                 <string name="responsive_explanation" >This is an example of a UI that responds well to device type. On phones, the menu will be placed inside a SlidingMenu, while on tablets the menu will be exposed alongside the content because we have enough room to always show it.
                 </string>
@@ -243,14 +243,14 @@
                 </string>
             </file>
             <file
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values/ids.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values/ids.xml"
                 qualifiers="" >
                 <item
                     name="selected_view"
                     type="id"/>
             </file>
             <file
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values/dimens.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values/dimens.xml"
                 qualifiers="" >
                 <dimen name="shadow_width" >15dp
                 </dimen>
@@ -265,7 +265,7 @@
                 </dimen>
             </file>
             <file
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values-large-land/dimens.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values-large-land/dimens.xml"
                 qualifiers="large-land" >
                 <dimen name="slidingmenu_offset" >450dp
                 </dimen>
@@ -275,7 +275,7 @@
                 </integer>
             </file>
             <file
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values-large/dimens.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values-large/dimens.xml"
                 qualifiers="large" >
                 <integer name="num_cols" >
 1
@@ -285,7 +285,7 @@
                 </dimen>
             </file>
             <file
-                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values-xlarge/dimens.xml"
+                path="/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values-xlarge/dimens.xml"
                 qualifiers="xlarge" >
                 <integer name="num_cols" >
 1

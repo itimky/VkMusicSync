@@ -79,7 +79,7 @@ public class ViewHolder implements DownloadEventListener {
     public void onProgressChanged(double downloadedSize, double totalSize) {
         barProgress.setIndeterminate(false);
         barProgress.setProgress((int)(downloadedSize  * 100 / totalSize));
-        textProgress.setText(context.getString(R.string.progress_state, downloadedSize, totalSize));
+        textProgress.setText(context.getString(R.string.audio_list_item_progress_state_template, downloadedSize, totalSize));
     }
 
     @Override

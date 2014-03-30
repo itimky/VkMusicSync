@@ -1,22 +1,23 @@
 package com.timky.vkmusicsync;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
+import android.text.InputType;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
@@ -28,8 +29,6 @@ import com.timky.vkmusicsync.helpers.Downloader;
 import com.timky.vkmusicsync.helpers.VKAudioListAdapter;
 import com.timky.vkmusicsync.models.IAudioListLoadListener;
 import com.timky.vkmusicsync.models.TaskResult;
-import com.vk.sdk.VKAccessToken;
-import com.vk.sdk.VKSdk;
 
 import java.io.File;
 
@@ -42,7 +41,7 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
     private RelativeLayout mAudioLoadingLayout;
     private SlidingMenu mMenu;
     private String mFilePath = "Music/";      // Slash is required
-    private int mForceSyncCount = 0;
+    private int mForceSyncCount = -1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,6 +50,11 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
         initialize();
         AudioListLoader.initialize(pageSize);
         AudioListLoader.setAudioSupport(mAudioListAdapter, this);
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
     }
 
     @Override
@@ -72,29 +76,79 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
 
         switch (id){
             case R.id.action_logout:
-                VKAccessToken token = VKSdk.getAccessToken();
-
-                if (token != null) {
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-                    SharedPreferences.Editor edit = prefs.edit();
-                    edit.remove(LoginActivity.tokenKey);
-                    edit.commit();
-                    VKSdk.setAccessToken(null, true);
-
-                    startLoginActivity();
-                }
+                LoginActivity.reLogin(this);
                 return true;
 
             case android.R.id.home:         // Slide menu
                 mMenu.toggle(true);
                 return true;
 
+            case R.id.sync_first_10:
+                mForceSyncCount = 10;
+                mAudioLoadingLayout.setVisibility(View.VISIBLE);
+                AudioListLoader.refresh(mForceSyncCount);
+                return true;
+
+            case R.id.sync_first_50:
+                mForceSyncCount = 50;
+                mAudioLoadingLayout.setVisibility(View.VISIBLE);
+                AudioListLoader.refresh(mForceSyncCount);
+                return true;
 
             case R.id.sync_first_100:
                 mForceSyncCount = 100;
                 mAudioLoadingLayout.setVisibility(View.VISIBLE);
                 AudioListLoader.refresh(mForceSyncCount);
                 return true;
+
+            case R.id.sync_first_n:
+                final EditText editText = new EditText(this);
+                editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                editText.setText("25");
+
+                DialogInterface.OnClickListener builderNClickListener =
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (which == DialogInterface.BUTTON_POSITIVE) {
+                                    String count = editText.getText().toString();
+
+                                if (count.compareTo("") == 0)
+                                    return;
+
+                                mForceSyncCount = Integer.parseInt(editText.getText().toString());
+                                mAudioLoadingLayout.setVisibility(View.VISIBLE);
+                                AudioListLoader.refresh(mForceSyncCount);
+                                }
+                            }
+                        };
+
+                AlertDialog.Builder builderN = new AlertDialog.Builder(this);
+                builderN.setView(editText);
+                builderN.setMessage(R.string.message_sync_first_n)
+                        .setPositiveButton(R.string.dialog_ok, builderNClickListener)
+                        .setNegativeButton(R.string.dialog_cancel, builderNClickListener)
+                        .show();
+
+                return true;
+
+            case R.id.sync_cancel:
+                DialogInterface.OnClickListener builderCancelClickListener =
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (which == DialogInterface.BUTTON_POSITIVE) {
+                                    mAudioListAdapter.cancelAllTasks();
+                                }
+                            }
+                        };
+
+                AlertDialog.Builder builderCancel = new AlertDialog.Builder(this);
+                builderCancel.setMessage(R.string.message_cancel_all_downloads)
+                        .setPositiveButton(R.string.dialog_yes, builderCancelClickListener)
+                        .setNegativeButton(R.string.dialog_no, builderCancelClickListener)
+                        .show();
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -104,8 +158,27 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.music_list, menu);
+        getMenuInflater().inflate(R.menu.action_menu, menu);
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+        MenuItem sync10 = menu.findItem(R.id.sync_first_10);
+        MenuItem sync50 = menu.findItem(R.id.sync_first_50);
+        MenuItem sync100 = menu.findItem(R.id.sync_first_100);
+        MenuItem syncN = menu.findItem(R.id.sync_first_n);
+        MenuItem cancel = menu.findItem(R.id.sync_cancel);
+
+        boolean downloading = mAudioListAdapter.anyTask();
+
+        sync10.setVisible(!downloading);
+        sync50.setVisible(!downloading);
+        sync100.setVisible(!downloading);
+        syncN.setVisible(!downloading);
+        cancel.setVisible(downloading);
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -116,6 +189,15 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
         }
 
         super.onBackPressed();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_MENU) {
+            return mMenu.isMenuShowing();  // Block menu button if sliding menu is opened
+        }                                   // True = event handled
+
+        return super.onKeyDown(keyCode, event);
     }
 
     private void initialize(){
@@ -163,13 +245,6 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
         mPullToRefreshView.getFooterLoadingView().refreshing();
     }
 
-    private void startLoginActivity() {
-        Intent intent = new Intent(MusicListActivity.this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-    }
-
     private void removeTempFile(){
         File tempFile = new File(Environment.getExternalStorageDirectory().getPath() + "/" + mFilePath,
                 Downloader.tempName);
@@ -182,7 +257,7 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
         if (!fullRefresh) {
             mPullToRefreshView.getFooterLoadingView().setVisibility(View.VISIBLE);
 
-            if (mForceSyncCount == 0) {
+            if (mForceSyncCount == -1) {
                 ListView listView = mPullToRefreshView.getRefreshableView();
                 listView.setSelection(listView.getCount() - 1);
             }
@@ -207,14 +282,11 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
     @Override
     public void onListLoadFinished(TaskResult result) {
         finishLoading();
+        result.handleError(this);
 
-        if (result.errorMessage != null)
-            Toast.makeText(getApplicationContext(), result.errorMessage,
-                    Toast.LENGTH_SHORT).show();
-
-        else if (mForceSyncCount != 0) {
+        if (mForceSyncCount != -1) {
             mAudioListAdapter.forceSync(mForceSyncCount);
-            mForceSyncCount = 0;
+            mForceSyncCount = -1;
         }
     }
 

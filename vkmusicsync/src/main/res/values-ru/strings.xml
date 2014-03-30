@@ -2,19 +2,32 @@
 <resources>
 
     <string name="action_logout">Выйти</string>
-    <string name="already_downloaded">Этот трек уже был загружен. Хотите перезаписать его?</string>
+    <string name="action_sync_cancel">Отменить все загрузки</string>
+    <string name="action_sync_first_10">Скачать первые 10</string>
+    <string name="action_sync_first_100">Скачать первые 100</string>
+    <string name="action_sync_first_50">Скачать первые 50</string>
+    <string name="action_sync_first_n">Скачать первые n…</string>
+
+    <string name="album_list_item_empty">Пусто…</string>
+    <string name="album_list_item_my_music">Мои аудиозаписи</string>
+    <string name="album_list_item_playlists">Плей-листы</string>
+
     <string name="app_name">VkMusicSync</string>
-    <string name="cancel_downloading">Отменить загрузку?</string>
-    <string name="drawer_close">Close drawer</string>
-    <string name="drawer_open">Open drawer</string>
-    <string name="empty">Пусто…</string>
-    <string name="my_music">Мои аудиозаписи</string>
-    <string name="no">Нет</string>
-    <string name="playlists">Плей-листы</string>
-    <string name="progress_state" formatted="false">%.2f Мб / %.2f Мб</string>
-    <string name="sync_first_100">Скачать первые 100</string>
+
+    <string name="audio_list_item_progress_state_template" formatted="false">%.2f Мб / %.2f Мб</string>
+
+    <string name="dialog_cancel">Отмена</string>
+    <string name="dialog_no">Нет</string>
+    <string name="dialog_ok">ОК</string>
+    <string name="dialog_yes">Да</string>
+
+    <string name="error_need_re_login">Необходимо заново авторизоваться</string>
+
+    <string name="message_already_downloaded">Этот трек уже был загружен. Хотите перезаписать его?</string>
+    <string name="message_cancel_all_downloads">Отменить все загрузки?</string>
+    <string name="message_cancel_download">Отменить загрузку?</string>
+    <string name="message_sync_first_n">Введите количество песен.\n(0 - скачать все свои аудиозаписи, может занять много времени)</string>
+
     <string name="title_activity_login">Вход</string>
-    <string name="update">Обновить</string>
-    <string name="yes">Да</string>
 
 </resources>

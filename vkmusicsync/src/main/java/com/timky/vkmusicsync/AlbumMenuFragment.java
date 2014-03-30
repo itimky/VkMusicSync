@@ -1,19 +1,17 @@
 package com.timky.vkmusicsync;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.timky.vkmusicsync.helpers.AudioListLoader;
 import com.timky.vkmusicsync.helpers.VKAlbumListAdapter;
+import com.timky.vkmusicsync.models.ErrorCodes;
 import com.timky.vkmusicsync.models.IAlbumListLoadListener;
 import com.timky.vkmusicsync.models.TaskResult;
 
@@ -49,10 +47,7 @@ public class AlbumMenuFragment extends ListFragment implements IAlbumListLoadLis
 
     @Override
     public void onListLoadFinished(TaskResult result) {
-        if (result.errorMessage != null)
-            Toast.makeText(getActivity(), result.errorMessage,
-                    Toast.LENGTH_SHORT).show();
-
         mAlbumLoadingLayout.setVisibility(View.GONE);
+        result.handleError(getActivity());
     }
 }

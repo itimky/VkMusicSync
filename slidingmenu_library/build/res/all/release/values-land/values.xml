@@ -15,7 +15,7 @@
     <dimen name="abc_action_bar_subtitle_text_size">12dp</dimen>
     <dimen name="abc_action_bar_subtitle_top_margin">-2dp</dimen>
     <dimen name="abc_action_bar_title_text_size">16dp</dimen>
-    <!-- From: file:/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values-land/dimens.xml -->
+    <!-- From: file:/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values-land/dimens.xml -->
     <eat-comment />
 
     <dimen name="slidingmenu_offset">200dp</dimen>

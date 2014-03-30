@@ -144,9 +144,9 @@ public class VKAudioListAdapter extends BaseAdapter {
                             };
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setMessage(R.string.already_downloaded)
-                            .setPositiveButton(R.string.yes, dialogClickListener)
-                            .setNegativeButton(R.string.no, dialogClickListener).show();
+                    builder.setMessage(R.string.message_already_downloaded)
+                            .setPositiveButton(R.string.dialog_yes, dialogClickListener)
+                            .setNegativeButton(R.string.dialog_no, dialogClickListener).show();
 
                 }
                 else if (audioInfo.isDownloading()){
@@ -160,9 +160,9 @@ public class VKAudioListAdapter extends BaseAdapter {
                             };
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setMessage(R.string.cancel_downloading)
-                            .setNegativeButton(R.string.no, dialogClickListener)
-                            .setPositiveButton(R.string.yes, dialogClickListener).show();
+                    builder.setMessage(R.string.message_cancel_download)
+                            .setNegativeButton(R.string.dialog_no, dialogClickListener)
+                            .setPositiveButton(R.string.dialog_yes, dialogClickListener).show();
                 }
                 else {
                     AudioDownloader.createTask(audioInfo, filePath);

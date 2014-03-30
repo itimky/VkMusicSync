@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- From: file:/C:/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values/colors.xml -->
+    <!-- From: file:/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values/colors.xml -->
     <eat-comment />
 
     <color name="black">#000</color>
@@ -9,7 +9,7 @@
     <color name="green">#090</color>
     <color name="red">#900</color>
     <color name="white">#FFF</color>
-    <!-- From: file:/C:/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values/attrs.xml -->
+    <!-- From: file:/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values/attrs.xml -->
     <eat-comment />
 
     <declare-styleable name="SlidingMenu">
@@ -39,21 +39,21 @@
         <attr name="selectorEnabled" format="boolean" />
         <attr name="selectorDrawable" format="reference" />
     </declare-styleable>
-    <!-- From: file:/C:/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values/dimens.xml -->
+    <!-- From: file:/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values/dimens.xml -->
     <eat-comment />
 
     <dimen name="list_padding">10dp</dimen>
     <dimen name="shadow_width">15dp</dimen>
     <dimen name="slidingmenu_offset">60dp</dimen>
-    <!-- From: file:/C:/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values/ids.xml -->
+    <!-- From: file:/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values/ids.xml -->
     <eat-comment />
 
     <item name="selected_view" type="id"/>
-    <!-- From: file:/C:/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values/dimens.xml -->
+    <!-- From: file:/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values/dimens.xml -->
     <eat-comment />
 
     <integer name="num_cols">1</integer>
-    <!-- From: file:/C:/Projects/Android/Java/VkMusicSync/slidingmenu_library/res/values/strings.xml -->
+    <!-- From: file:/home/timky/Projects/Android/Java/VkMusicSync/slidingmenu_library/src/main/res/values/strings.xml -->
     <eat-comment />
 
     <string name="about">About</string>

@@ -221,6 +221,10 @@ public class VKSdk {
                 checkAndSetToken(tokenParams, false);
             }
         }
+        else if (resultCode == 0 && sInstance.mListener != null){
+            sInstance.mListener.onAuthDecline();
+        }
+
 
         return false;
     }

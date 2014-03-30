@@ -146,6 +146,8 @@ public class VKOpenAuthActivity extends Activity {
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
             canShowPage = false;
+            if (errorCode == -2)
+                description = getString(R.string.vk_no_internet_access);
             new AlertDialog.Builder(VKOpenAuthActivity.this)
                     .setMessage(description)
                     .setPositiveButton(R.string.vk_retry, new DialogInterface.OnClickListener() {

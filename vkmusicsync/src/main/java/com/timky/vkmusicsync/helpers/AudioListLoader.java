@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 
+import com.timky.vkmusicsync.models.ErrorCodes;
 import com.timky.vkmusicsync.models.IAlbumListLoadListener;
 import com.timky.vkmusicsync.models.IAudioListLoadListener;
 import com.timky.vkmusicsync.models.TaskResult;
@@ -44,7 +45,7 @@ public class AudioListLoader extends AsyncTask<Void, Void, AudioListLoader.Audio
 
     public static void initialize(int pageSize){
         mPageSize = pageSize;
-        mCustomRefreshSize = 0;
+        mCustomRefreshSize = -1;
         mOffset = 0;
         mBackupOffset = 0;
         mIsAlbumMode = false;
@@ -194,13 +195,16 @@ public class AudioListLoader extends AsyncTask<Void, Void, AudioListLoader.Audio
                     message = error.errorMessage;
 
                 Log.e("Loading list of audio failed: ", message);
+
                 result.errorMessage = message;
+                result.errorCode = error.errorCode;
+                updateError(result);
             }
         });
     }
 
     private void loadAudioList(final AudioListLoaderResult result){
-        int count = mCustomRefreshSize == 0 ? mPageSize : mCustomRefreshSize;
+        int count = mCustomRefreshSize == -1 ? mPageSize : mCustomRefreshSize;
 
         VKRequest request = new VKRequest("audio.get", VKParameters.from(VKApiConst.COUNT, count, VKApiConst.OFFSET, mOffset, VKApiConst.ALBUM_ID, mAlbumId));
         request.executeWithListener(new VKRequest.VKRequestListener() {
@@ -236,7 +240,10 @@ public class AudioListLoader extends AsyncTask<Void, Void, AudioListLoader.Audio
                     message = error.errorMessage;
 
                 Log.e("Loading list of audio failed: ", message);
+
                 result.errorMessage = message;
+                result.errorCode = error.errorCode;
+                updateError(result);
             }
         });
     }
@@ -269,6 +276,7 @@ public class AudioListLoader extends AsyncTask<Void, Void, AudioListLoader.Audio
 
         mIsAlbumMode = false;
         mOffset = mBackupOffset;
+        mCustomRefreshSize = -1;
     }
 
     private void onAlbumLoadPostExecute(AudioListLoaderResult result){
@@ -285,10 +293,16 @@ public class AudioListLoader extends AsyncTask<Void, Void, AudioListLoader.Audio
         if (result.audioInfoList != null && (result.audioInfoList.size() != 0 || mAlbumId != 0))
             if (mOffset == 0) {
                 mAudioListAdapter.refresh(result.audioInfoList);
-                mOffset = mCustomRefreshSize == 0 ? mPageSize : mCustomRefreshSize;
+
+                if (mCustomRefreshSize == -1)
+                    mOffset = mPageSize;
+                else if (mCustomRefreshSize == 0)
+                    mOffset = result.audioInfoList.size();
+                else
+                    mOffset = mCustomRefreshSize;
 
                 if (result.audioInfoList.size() < mCustomRefreshSize) {
-                    mCustomRefreshSize = 0;
+                    mCustomRefreshSize = -1;
                     loadMore();
                     return;
                 }
@@ -298,9 +312,20 @@ public class AudioListLoader extends AsyncTask<Void, Void, AudioListLoader.Audio
                 mOffset += mPageSize;
             }
         mBackupOffset = mOffset;
+        mCustomRefreshSize = -1;
 
         if (mAudioListLoadListener != null)
             mAudioListLoadListener.onListLoadFinished(result);
+    }
+
+    private static void updateError(TaskResult result){
+        if (result.errorCode == ErrorCodes.wrongTokenIp) {
+            result.errorMessage = "Need re-login";
+            result.errorCode = ErrorCodes.needReLogin;
+        }
+        else if (result.errorCode == ErrorCodes.connectionRefused ) {
+            result.errorMessage = "No internet access";
+        }
     }
 
     class AudioListLoaderResult extends TaskResult {

@@ -1,0 +1,36 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.timky.vkmusicsync.MusicListActivity" >
+
+    <item
+        android:id="@+id/action_logout"
+        android:title="@string/action_logout"
+        android:orderInCategory="100"
+        app:showAsAction="always|withText" />
+
+    <item android:id="@+id/sync_first_10"
+        android:title="@string/action_sync_first_10"
+        android:orderInCategory="0"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/sync_first_50"
+        android:title="@string/action_sync_first_50"
+        android:orderInCategory="1"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/sync_first_100"
+        android:title="@string/action_sync_first_100"
+        android:orderInCategory="2"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/sync_first_n"
+        android:title="@string/action_sync_first_n"
+        android:orderInCategory="3"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/sync_cancel"
+        android:title="@string/action_sync_cancel"
+        android:orderInCategory="4"
+        app:showAsAction="never" />
+</menu>
