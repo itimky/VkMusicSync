@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Smart adapter for audio list
  * Created by timky on 3/8/14.
  */
 public class VKAudioListAdapter extends BaseAdapter {
@@ -110,7 +111,7 @@ public class VKAudioListAdapter extends BaseAdapter {
             TextView title = (TextView) convertView.findViewById(R.id.title);
             ProgressBar barProgress = (ProgressBar) convertView.findViewById(R.id.bar_progress);
             TextView textProgress = (TextView) convertView.findViewById(R.id.text_progress);
-            CheckBox isDownloaded = (CheckBox) convertView.findViewById(R.id.is_downloaded);
+            ImageView isDownloaded = (ImageView) convertView.findViewById(R.id.is_downloaded);
 
             ViewHolder viewHolder = new ViewHolder(
                     context, artist, title, isDownloaded, barProgress, textProgress);

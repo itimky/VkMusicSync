@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Smart adapter for album list
  * Created by timky on 25.03.14.
  */
 public class VKAlbumListAdapter extends BaseAdapter {

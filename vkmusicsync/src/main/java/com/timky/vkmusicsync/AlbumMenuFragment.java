@@ -7,11 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.timky.vkmusicsync.helpers.AudioListLoader;
 import com.timky.vkmusicsync.helpers.VKAlbumListAdapter;
-import com.timky.vkmusicsync.models.ErrorCodes;
 import com.timky.vkmusicsync.models.IAlbumListLoadListener;
 import com.timky.vkmusicsync.models.TaskResult;
 

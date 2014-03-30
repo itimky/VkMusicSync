@@ -5,9 +5,9 @@
 
     <item
         android:id="@+id/action_logout"
-        android:title="@string/action_logout"
+        android:icon="@drawable/ic_vkmusicsync_logout"
         android:orderInCategory="100"
-        app:showAsAction="always|withText" />
+        app:showAsAction="always" />
 
     <item android:id="@+id/sync_first_10"
         android:title="@string/action_sync_first_10"

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
-import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,19 +16,19 @@ import com.timky.vkmusicsync.R;
  */
 public class ViewHolder implements DownloadEventListener {
 
-    protected final Context context;
+    protected final Context mContext;
     public final TextView artist;
     public final TextView title;
-    public final CheckBox checkBox;
+    public final ImageView downloaded;
     public final ProgressBar barProgress;
     public final TextView textProgress;
     protected VKAudioInfo audioInfo;
 
-    public ViewHolder(Context context, TextView artist, TextView title, CheckBox checkBox, ProgressBar barProgress, TextView textProgress){
-        this.context = context;
+    public ViewHolder(Context context, TextView artist, TextView title, ImageView downloaded, ProgressBar barProgress, TextView textProgress){
+        this.mContext = context;
         this.artist = artist;
         this.title = title;
-        this.checkBox = checkBox;
+        this.downloaded = downloaded;
         this.barProgress = barProgress;
         this.textProgress = textProgress;
     }
@@ -45,7 +45,8 @@ public class ViewHolder implements DownloadEventListener {
         this.audioInfo = audioInfo;
 
         // if ai downloading - progress is visible
-        int visibility = audioInfo.isDownloading() ? View.VISIBLE : View.GONE;
+        int downloading = audioInfo.isDownloading() ? View.VISIBLE : View.GONE;
+        int isDownloaded = audioInfo.isDownloaded() ? View.VISIBLE : View.GONE;
 
         // if downloading hasn't started - progress is indeterminate
         boolean isIndeterminate = false;
@@ -57,9 +58,9 @@ public class ViewHolder implements DownloadEventListener {
         artist.setText(audioInfo.artist);
         title.setText(audioInfo.title);
         barProgress.setIndeterminate(isIndeterminate);
-        barProgress.setVisibility(visibility);
-        textProgress.setVisibility(visibility);
-        checkBox.setChecked(audioInfo.isDownloaded());
+        barProgress.setVisibility(downloading);
+        textProgress.setVisibility(downloading);
+        downloaded.setVisibility(isDownloaded);
         audioInfo.downloadListener = this;
     }
 
@@ -79,22 +80,22 @@ public class ViewHolder implements DownloadEventListener {
     public void onProgressChanged(double downloadedSize, double totalSize) {
         barProgress.setIndeterminate(false);
         barProgress.setProgress((int)(downloadedSize  * 100 / totalSize));
-        textProgress.setText(context.getString(R.string.audio_list_item_progress_state_template, downloadedSize, totalSize));
+        textProgress.setText(mContext.getString(R.string.audio_list_item_progress_state_template, downloadedSize, totalSize));
     }
 
     @Override
     public void onDownloadedChanged(boolean isDownloaded, String fullFilePath) {
-        checkBox.setChecked(isDownloaded);
+        this.downloaded.setVisibility(isDownloaded ? View.VISIBLE : View.GONE);
 
         // IsDownloading must be true to refresh sd-card media
         if (isDownloaded && fullFilePath != null && audioInfo.isDownloading())
-            context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
+            mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
                     + audioInfo.getFileFullName(fullFilePath))));
     }
 
     @Override
     public void onDownloadError(String errorMessage) {
-        Toast.makeText(context, errorMessage,
+        Toast.makeText(mContext, errorMessage,
                 Toast.LENGTH_SHORT).show();
     }
 }

@@ -37,11 +37,18 @@
         android:layout_weight="15"
         android:gravity="center">
 
-        <CheckBox
+        <ImageView
             android:id="@+id/is_downloaded"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="false"/>
+            android:visibility="gone"
+            android:src="@drawable/ic_action_accept"/>
+
+        <!--<CheckBox-->
+            <!--android:id="@+id/is_downloaded"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:clickable="false"/>-->
     </LinearLayout>
 
 
