@@ -1,8 +1,16 @@
 apply plugin: 'android'
-
 android {
     compileSdkVersion 19
     buildToolsVersion '19.0.3'
+
+    signingConfigs {
+        release {
+            storeFile file("/home/timky/.android/timky.jks")
+            storePassword "mordor"
+            keyAlias "vkmusicsynckey"
+            keyPassword "mordor"
+        }
+    }
 
     defaultConfig {
         minSdkVersion 8
@@ -11,14 +19,23 @@ android {
         versionName "1.0"
     }
     buildTypes {
-        release {
+        debug {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            debuggable true
+        }
+
+        release {
+            runProguard true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            debuggable false
+            signingConfig signingConfigs.release
         }
     }
 }
 
 dependencies {
+    compile files('src/main/libs/libGoogleAnalyticsServices.jar')
     compile 'com.android.support:appcompat-v7:+'
     compile 'com.android.support:support-v4:+'
     compile project(':vksdk_library')

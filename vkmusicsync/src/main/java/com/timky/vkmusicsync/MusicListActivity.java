@@ -19,16 +19,20 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import com.google.analytics.tracking.android.EasyTracker;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 import com.timky.vkmusicsync.helpers.AudioListLoader;
-import com.timky.vkmusicsync.helpers.Downloader;
+import com.timky.vkmusicsync.helpers.VKAudioDownloadManager;
 import com.timky.vkmusicsync.helpers.VKAudioListAdapter;
 import com.timky.vkmusicsync.models.IAudioListLoadListener;
 import com.timky.vkmusicsync.models.TaskResult;
+import com.vk.sdk.VKAccessToken;
+import com.vk.sdk.VKSdk;
+import com.vk.sdk.VKUIHelper;
 
 import java.io.File;
 
@@ -41,7 +45,9 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
     private RelativeLayout mAudioLoadingLayout;
     private SlidingMenu mMenu;
     private String mFilePath = "Music/";      // Slash is required
+    private String mTempFileName = "sync.tmp";
     private int mForceSyncCount = -1;
+    private VKAudioDownloadManager mAudioDownloadManager = new VKAudioDownloadManager(mFilePath, mTempFileName);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,12 +61,26 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
     @Override
     protected void onResume(){
         super.onResume();
+        VKUIHelper.onResume(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EasyTracker.getInstance(this).activityStart(this);
+    }
+
+    @Override
+    protected void onStop() {
+        EasyTracker.getInstance(this).activityStop(this);
+        super.onStop();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mAudioListAdapter.cancelAllTasks();
+        VKUIHelper.onDestroy(this);
+        mAudioDownloadManager.cancelAllTasks();
         removeTempFile();
     }
 
@@ -138,7 +158,7 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (which == DialogInterface.BUTTON_POSITIVE) {
-                                    mAudioListAdapter.cancelAllTasks();
+                                    mAudioDownloadManager.cancelAllTasks();
                                 }
                             }
                         };
@@ -170,7 +190,7 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
         MenuItem syncN = menu.findItem(R.id.sync_first_n);
         MenuItem cancel = menu.findItem(R.id.sync_cancel);
 
-        boolean downloading = mAudioListAdapter.anyTask();
+        boolean downloading = mAudioDownloadManager.isDownloading();
 
         sync10.setVisible(!downloading);
         sync50.setVisible(!downloading);
@@ -202,7 +222,7 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
 
     private void initialize(){
         setContentView(R.layout.activity_music_list);
-        mAudioListAdapter = new VKAudioListAdapter(this, mFilePath);
+        mAudioListAdapter = new VKAudioListAdapter(this, mAudioDownloadManager);
         mAudioLoadingLayout = (RelativeLayout)findViewById(R.id.audio_loading_layout);
         initializePullToRefresh();
         initializeSlidingMenu();
@@ -247,7 +267,7 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
 
     private void removeTempFile(){
         File tempFile = new File(Environment.getExternalStorageDirectory().getPath() + "/" + mFilePath,
-                Downloader.tempName);
+                mTempFileName);
         if (tempFile.exists())
             tempFile.delete();
     }
@@ -257,10 +277,6 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
         if (!fullRefresh) {
             mPullToRefreshView.getFooterLoadingView().setVisibility(View.VISIBLE);
 
-            if (mForceSyncCount == -1) {
-                ListView listView = mPullToRefreshView.getRefreshableView();
-                listView.setSelection(listView.getCount() - 1);
-            }
         }
         else if (!mPullToRefreshView.isRefreshing())
             mAudioLoadingLayout.setVisibility(View.VISIBLE);
@@ -294,6 +310,16 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
         mPullToRefreshView.onRefreshComplete();
         mPullToRefreshView.getFooterLoadingView().setVisibility(View.GONE);
         mAudioLoadingLayout.setVisibility(View.GONE);
+    }
+
+    private void setFilePath(String filePath){
+        mFilePath = filePath;
+        mAudioDownloadManager.setFilePath(filePath);
+    }
+
+    private void setTempFileName(String tempFileName) {
+        mTempFileName = tempFileName;
+        mAudioDownloadManager.setTempFileName(tempFileName);
     }
 
 //    /**

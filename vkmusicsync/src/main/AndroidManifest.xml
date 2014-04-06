@@ -3,12 +3,13 @@
     package="com.timky.vkmusicsync" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_vkmusicsync_launcher"
-        android:logo="@drawable/ic_vkmusicsync_content"
+        android:logo="@drawable/ic_vkmusicsync_logo"
         android:label="@string/app_name"
         android:theme="@style/VkTheme" >
         <activity
@@ -20,9 +21,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--<activity-->
-            <!--android:name="com.vk.sdk.VKOpenAuthActivity"-->
-            <!--android:configChanges="orientation|keyboardHidden|screenSize" />-->
         <activity
             android:name=".MusicListActivity"
             android:label=""

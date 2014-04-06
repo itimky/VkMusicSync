@@ -7,9 +7,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.timky.vkmusicsync.R;
+import com.timky.vkmusicsync.helpers.DownloadManager;
 
 /**
  * Created by timky on 14.03.14.
@@ -45,7 +45,7 @@ public class ViewHolder implements IDownloadListener {
         this.audioInfo = audioInfo;
 
         // if ai downloading - progress is visible
-        int downloading = audioInfo.isDownloading() ? View.VISIBLE : View.GONE;
+        int downloading = audioInfo.getTaskId() != DownloadManager.mNoTaskId ? View.VISIBLE : View.GONE;
         int isDownloaded = audioInfo.isDownloaded() ? View.VISIBLE : View.GONE;
 
         // if downloading hasn't started - progress is indeterminate
@@ -64,21 +64,8 @@ public class ViewHolder implements IDownloadListener {
         audioInfo.subscribe(this);
     }
 
-//    @Override
-//    public void onDownloadingChanged(Downloadable downloadable) {
-//        boolean isDownloading = downloadable.isDownloading();
-//        int visibility = isDownloading ? View.VISIBLE : View.GONE;
-//
-//        barProgress.setProgress(0);
-//        barProgress.setVisibility(visibility);
-//        barProgress.setIndeterminate(isDownloading);
-//
-//        textProgress.setVisibility(visibility);
-//        textProgress.setText("");
-//    }
-
     @Override
-    public void onDownloadPrepare(Downloadable downloadable) {
+    public void onDownloadPrepare(DownloadInfo downloadInfo) {
         barProgress.setProgress(0);
         barProgress.setVisibility(View.VISIBLE);
         barProgress.setIndeterminate(true);
@@ -86,21 +73,21 @@ public class ViewHolder implements IDownloadListener {
         textProgress.setVisibility(View.VISIBLE);
         textProgress.setText(
                 mContext.getString(R.string.audio_list_item_progress_template,
-                                downloadable.getDownloadedSize(), downloadable.getTotalSize()));
+                                downloadInfo.getDownloadedSize(), downloadInfo.getTotalSize()));
     }
 
     @Override
-    public void onDownloadBegin(Downloadable downloadable) {
+    public void onDownloadBegin(DownloadInfo downloadInfo) {
 
     }
 
     @Override
-    public void onDownloadComplete(Downloadable downloadable) {
+    public void onDownloadComplete(DownloadInfo downloadInfo) {
         completeDownload();
     }
 
     @Override
-    public void onDownloadCancel(Downloadable downloadable) {
+    public void onDownloadCancel(DownloadInfo downloadInfo) {
         completeDownload();
     }
 
@@ -113,12 +100,20 @@ public class ViewHolder implements IDownloadListener {
 
     @Override
     public void onDownloadedChanged(boolean isDownloaded, String fullFilePath) {
+
         this.downloaded.setVisibility(isDownloaded ? View.VISIBLE : View.GONE);
 
-        // IsDownloading must be true to refresh sd-card media
-        if (isDownloaded && fullFilePath != null && audioInfo.isDownloading())
-            mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
-                    + audioInfo.getFileFullName(fullFilePath))));
+        // If just downloaded - updating media cache
+        if (isDownloaded) {
+            mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                    Uri.parse("file://" + audioInfo.getFileFullName(fullFilePath))));
+//            mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
+//                    + audioInfo.getFileFullName(fullFilePath))));
+//            MediaScannerConnection.scanFile(mContext,
+//                    new String[]{ audioInfo.getFilePath() },
+//                    new String[]{ "*/*" },
+//                    null);
+        }
     }
 
     @Override

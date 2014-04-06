@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +15,13 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.Tracker;
 import com.timky.vkmusicsync.R;
-import com.timky.vkmusicsync.models.Downloadable;
+import com.timky.vkmusicsync.models.DownloadInfo;
+import com.timky.vkmusicsync.models.TaskState;
+import com.timky.vkmusicsync.models.Events;
 import com.timky.vkmusicsync.models.IDownloadListener;
 import com.timky.vkmusicsync.models.TaskResult;
 import com.timky.vkmusicsync.models.VKAudioInfo;
@@ -31,44 +37,40 @@ import java.util.List;
  */
 public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener {
     private List<VKAudioInfo> mAudioInfoList = new ArrayList<VKAudioInfo>();
+    private final VKAudioDownloadManager mAudioDownloadManager;
     private final Context mContext;
     private NotificationCompat.Builder mBuilder;
     private NotificationManager mNotifyManager;
-    private int mTotal;
-    private int mProgress;
+    //private int mTotal;
+    //private int mProgress;
+    private double mProgressSizeSinceUpdate = 0;
+    private double mLastProgressSize = 0;
 
-    public String filePath;
-
-    public VKAudioListAdapter(Context context, String filePath){
-        this.filePath = filePath;
-
+    public VKAudioListAdapter(Context context, VKAudioDownloadManager audioDownloadManager){
         mContext = context;
+        mAudioDownloadManager = audioDownloadManager;
         mBuilder = new NotificationCompat.Builder(context);
         mNotifyManager = (NotificationManager) context.
                 getSystemService(Context.NOTIFICATION_SERVICE);
 
-        mTotal = 0;
-        mProgress = 0;
+        //mTotal = 0;
+        //mProgress = 0;
     }
 
     public void refresh(List<VKAudioInfo> audioInfoList){
-        AudioDownloader.checkIsDownloaded(audioInfoList, filePath);
+        mAudioDownloadManager.checkIsDownloaded(audioInfoList);
         mAudioInfoList = audioInfoList;
         notifyDataSetChanged();
     }
 
     public void addAll(List<VKAudioInfo> audioInfoList){
-        AudioDownloader.checkIsDownloaded(audioInfoList, filePath);
+        mAudioDownloadManager.checkIsDownloaded(audioInfoList);
         mAudioInfoList.addAll(audioInfoList);
         notifyDataSetChanged();
     }
 
     public boolean anyTask(){
-        for (Downloadable downloadable : mAudioInfoList)
-            if (downloadable.task != null)
-                return true;
-
-        return false;
+        return mAudioDownloadManager.isDownloading();
     }
 
     public void forceSync(int count){
@@ -77,23 +79,23 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
             if (audioInfo.isDownloaded())
                 continue;
 
-            if (audioInfo.task != null)
-                audioInfo.task.cancel(false);
+            if (audioInfo.getTaskId() != DownloadManager.mNoTaskId)
+                continue;
 
             audioInfo.subscribe(this);
-            AudioDownloader.createTask(audioInfo, filePath);
-            audioInfo.task.execute();
+            mAudioDownloadManager.download(audioInfo);
         }
-    }
 
-    public void cancelAllTasks(){
-        for (VKAudioInfo audioInfo : mAudioInfoList)
-            if (audioInfo.task != null)
-                audioInfo.task.cancel(false);
-
-        mProgress = 0;
-        mTotal = 0;
+        invalidateMenu();
     }
+//
+//    public void cancelAllTasks(){
+//        for (VKAudioInfo audioInfo : mAudioInfoList)
+//            audioInfo.cancelDownload();
+//
+//        //mProgress = 0;
+//        //mTotal = 0;
+//    }
 
     @Override
     public int getCount() {
@@ -153,15 +155,15 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
             @Override
             public void onClick(View v) {
 
-                if (audioInfo.isDownloaded() && !audioInfo.isDownloading()){
+                if (audioInfo.isDownloaded() && audioInfo.getTaskId() == DownloadManager.mNoTaskId){
                     DialogInterface.OnClickListener dialogClickListener =
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     if (which == DialogInterface.BUTTON_POSITIVE) {
-                                        AudioDownloader.createTask(audioInfo, filePath);
                                         audioInfo.subscribe(VKAudioListAdapter.this);
-                                        audioInfo.task.execute();
+                                        mAudioDownloadManager.download(audioInfo);
+                                        invalidateMenu();
                                     }
                                 }
                             };
@@ -172,13 +174,14 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
                             .setNegativeButton(R.string.dialog_no, dialogClickListener).show();
 
                 }
-                else if (audioInfo.isDownloading()){
+                else if (audioInfo.getTaskId() != DownloadManager.mNoTaskId){
                     DialogInterface.OnClickListener dialogClickListener =
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     if (which == DialogInterface.BUTTON_POSITIVE) {
-                                        audioInfo.task.cancel(false);
+                                        mAudioDownloadManager.cancelTask(audioInfo);
+                                        invalidateMenu();
                                     }
                                 }
                             };
@@ -189,59 +192,54 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
                             .setPositiveButton(R.string.dialog_yes, dialogClickListener).show();
                 }
                 else {
-                    AudioDownloader.createTask(audioInfo, filePath);
                     audioInfo.subscribe(VKAudioListAdapter.this);
-                    audioInfo.task.execute();
+                    mAudioDownloadManager.download(audioInfo);
+                    invalidateMenu();
                 }
             }
         });
     }
 
-//    @Override
-//    public void onDownloadingChanged(Downloadable audInfo) {
-//        if (!audInfo.isDownloading()) {
-//
-//        }
-//    }
-
     @Override
-    public void onDownloadPrepare(Downloadable downloadable) {
-        mTotal++;
+    public void onDownloadPrepare(DownloadInfo downloadInfo) {
+        // Updating total downloads
+        DownloadInfo current = mAudioDownloadManager.getCurrentTask();
+        mBuilder.setContentText(mContext.getString(R.string.notification_progress_template,
+                                current.getDownloadedSize(), current.getTotalSize(),
+                                mAudioDownloadManager.getProgress(),
+                                mAudioDownloadManager.getTotal())
+                );
+        mNotifyManager.notify(0, mBuilder.build());
     }
 
     @Override
-    public void onDownloadBegin(Downloadable downloadable) {
-        VKAudioInfo audioInfo = (VKAudioInfo)downloadable;
-        //mBuilder.setProgress(100, incr, false);
+    public void onDownloadBegin(DownloadInfo downloadInfo) {
+        notifyAction(Events.DOWNLOAD_BEGIN);
+        clearBuilder();
+        VKAudioInfo audioInfo = (VKAudioInfo) downloadInfo;
         mBuilder.setContentTitle(audioInfo.getFileName())
                 .setContentText(
                         mContext.getString(R.string.notification_progress_template,
-                                audioInfo.getDownloadedSize(), audioInfo.getDownloadedSize(),
-                                mProgress, mTotal)
+                                audioInfo.getDownloadedSize(), audioInfo.getTotalSize(),
+                                mAudioDownloadManager.getProgress(),
+                                mAudioDownloadManager.getTotal())
                 )
-                .setSmallIcon(R.drawable.ic_vkmusicsync_content)
+                .setSmallIcon(R.drawable.ic_vkmusicsync_logo)
                 .setProgress(0, 0, true);
         // Displays the progress bar for the first time.
         mNotifyManager.notify(0, mBuilder.build());
-        //barProgress.setProgress(0);
-        //barProgress.setVisibility(visibility);
-        //barProgress.setIndeterminate(isDownloading);
-
-        //textProgress.setVisibility(visibility);
-        //textProgress.setText("");
-
     }
 
     @Override
-    public void onDownloadComplete(Downloadable downloadable) {
-        VKAudioInfo audioInfo = (VKAudioInfo)downloadable;
+    public void onDownloadComplete(DownloadInfo downloadInfo) {
+        notifyAction(Events.DOWNLOAD_COMPLETE);
+        VKAudioInfo audioInfo = (VKAudioInfo) downloadInfo;
         audioInfo.unsubscribe(this);
-        mProgress++;
+        clearBuilder();
 
-        if (mProgress == mTotal) {
-            clearBuilder();
+        if (mAudioDownloadManager.isAllComplete()) {
 
-            if (mTotal == 1) {
+            if (mAudioDownloadManager.getTotal() == 1) {
                 mBuilder.setContentTitle(audioInfo.getFileName())
                         .setContentText(
                                 mContext.getString(R.string.notification_download_complete));
@@ -249,36 +247,63 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
             else
                 mBuilder.setContentTitle(
                         mContext.getString(R.string.notification_download_all_complete_template,
-                                mProgress, mTotal)
+                                mAudioDownloadManager.getProgress(),
+                                mAudioDownloadManager.getTotal())
                 );
 
             mNotifyManager.notify(0, mBuilder.build());
-            mProgress = 0;
-            mTotal = 0;
         }
     }
 
     @Override
-    public void onDownloadCancel(Downloadable downloadable) {
+    public void onDownloadCancel(DownloadInfo downloadInfo) {
 
-        if (mTotal == 1){
+        // Displaying "Canceled" message
+        if (mAudioDownloadManager.getDownloadingCount() == 1){
             clearBuilder();
-            mBuilder.setContentTitle(mContext.getString(R.string.notification_download_canceled));
+            if (mAudioDownloadManager.getCanceled() == 1){
+                mBuilder.setContentTitle(mContext.getString(R.string.notification_download_canceled));
+                mNotifyManager.notify(0, mBuilder.build());
+            }
+            else {
+                mBuilder.setContentTitle(mContext.getString(R.string.notification_download_all_canceled));
+                mNotifyManager.notify(0, mBuilder.build());
+            }
+        }
+        else {
+            // Updating total downloads
+            DownloadInfo current = mAudioDownloadManager.getCurrentTask();
+            mBuilder.setContentText(mContext.getString(R.string.notification_progress_template,
+                            current.getDownloadedSize(), current.getTotalSize(),
+                            mAudioDownloadManager.getProgress(),
+                            mAudioDownloadManager.getTotal())
+            );
             mNotifyManager.notify(0, mBuilder.build());
         }
-
-        mTotal--;
-
     }
 
+    /**
+     * Notifies only every 100 KB
+     * @param downloadedSize
+     * @param totalSize
+     */
     @Override
     public void onProgressChanged(double downloadedSize, double totalSize) {
-        mBuilder.setProgress(100, (int)(downloadedSize  * 100 / totalSize), false)
-        .setContentText(
-                mContext.getString(R.string.notification_progress_template,
-                        downloadedSize, totalSize, mProgress, mTotal));
-        mNotifyManager.notify(0, mBuilder.build());
+        mProgressSizeSinceUpdate += downloadedSize - mLastProgressSize;
+        mLastProgressSize = downloadedSize;
 
+        // Trick to optimize performance - notify only every 100KB
+        if (mProgressSizeSinceUpdate >= 0.1) {
+            mBuilder.setProgress(100, (int) (downloadedSize * 100 / totalSize), false)
+                    .setContentText(
+                            mContext.getString(R.string.notification_progress_template,
+                                    downloadedSize, totalSize,
+                                    mAudioDownloadManager.getProgress(),
+                                    mAudioDownloadManager.getTotal())
+                    );
+            mNotifyManager.notify(0, mBuilder.build());
+            mProgressSizeSinceUpdate = 0;
+        }
     }
 
     @Override
@@ -288,7 +313,7 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
 
     @Override
     public void onDownloadError(TaskResult result) {
-        cancelAllTasks();
+        mAudioDownloadManager.cancelAllTasks();
         clearBuilder();
         mBuilder.setContentTitle(mContext.getString(R.string.notification_download_error));
         mNotifyManager.notify(0, mBuilder.build());
@@ -298,5 +323,37 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
         mBuilder.setContentTitle(null)
                 .setContentText(null)
                 .setProgress(0, 0, false);
+        mLastProgressSize = 0;
+        mProgressSizeSinceUpdate = 0;
+    }
+
+    private void invalidateMenu(){
+        ((FragmentActivity)mContext).supportInvalidateOptionsMenu();
+    }
+
+    private void notifyAction(Events event){
+        Tracker v3EasyTracker = EasyTracker.getInstance(mContext);
+
+        switch (event){
+            case DOWNLOAD_BEGIN:
+                v3EasyTracker.send(MapBuilder
+                                .createEvent(
+                                        "DownloadState",
+                                        "DownloadBegin",
+                                        "onDownloadBegin", null)
+                                .build()
+                );
+                break;
+
+            case DOWNLOAD_COMPLETE:
+                v3EasyTracker.send(MapBuilder
+                                .createEvent(
+                                        "DownloadState",
+                                        "DownloadComplete",
+                                        "onDownloadComplete", null)
+                                .build()
+                );
+                break;
+        }
     }
 }

@@ -83,6 +83,8 @@
         <item name="android:layout_marginLeft">10dp</item>
         <item name="android:visibility">gone</item>
         <item name="android:progressDrawable">@drawable/custom_progressbar</item>
+        <item name="android:indeterminateDrawable">@android:drawable/progress_indeterminate_horizontal</item>
+        <!--<item name="android:indeterminateDrawable">@drawable/custom_indeterminate_progressbar</item>-->
     </style>
 
     <style name="VkTextViewButtonStyle">
