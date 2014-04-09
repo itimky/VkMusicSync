@@ -21,33 +21,31 @@ import java.util.List;
  * Created by timky on 25.03.14.
  */
 public class VKAlbumListAdapter extends BaseAdapter {
-    //public AlbumSelectedListener onAlbumSelectedListener;
 
     private List<VKAlbum> albumList = new ArrayList<VKAlbum>();
-    private final Context context;
+    private final Context mContext;
     private VKAlbum selectedAlbum;
-    //private final DrawerLayout drawerLayout;
 
     public VKAlbumListAdapter(Context context){
-        this.context = context;
+        this.mContext = context;
     }
 
     public void refresh(List<VKAlbum> albumList){
         this.albumList.clear();
 
         VKAlbum myMusic = new VKAlbum();                            // Menu item "My music" -> selects all music from all albums
-        myMusic.album_id = ListViewItemKind.MyMusic;
-        myMusic.title = context.getString(R.string.album_list_item_my_music);
+        myMusic.id = ListViewItemKind.MyMusic;
+        myMusic.title = mContext.getString(R.string.album_list_item_my_music);
         myMusic.setIsSelected(true);
         this.albumList.add(myMusic);
 
         VKAlbum playListHeader = new VKAlbum();                     // Menu header "Playlists", non-clickable
-        playListHeader.album_id = ListViewItemKind.PlayListHeader;
+        playListHeader.id = ListViewItemKind.PlayListHeader;
         this.albumList.add(playListHeader);
 
         if (albumList.size() == 0){
             VKAlbum empty = new VKAlbum();
-            empty.album_id = ListViewItemKind.EmptyList;
+            empty.id = ListViewItemKind.EmptyList;
             this.albumList.add(empty);
         }
         else {
@@ -58,7 +56,7 @@ public class VKAlbumListAdapter extends BaseAdapter {
         selectedAlbum = myMusic;
         notifyDataSetChanged();
 
-        AudioListLoader.setmAlbumId(selectedAlbum.album_id);
+        AudioListLoader.setmAlbumId(selectedAlbum.id);
     }
 
     @Override
@@ -73,7 +71,7 @@ public class VKAlbumListAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return albumList.get(position).album_id;
+        return albumList.get(position).id;
     }
 
     @Override
@@ -81,23 +79,43 @@ public class VKAlbumListAdapter extends BaseAdapter {
 
         VKAlbum album = albumList.get(position);
 
+        // UPDATE: Now id is int, and I can use switch
+
         // I can't use switch in stupid Java... Switch statement data type can't be long.
         // Of course I can cast long to int, but in some cases long value != -1 && != 0, but int value does.
 
-        if (album.album_id == ListViewItemKind.PlayListHeader){
-            return LayoutInflater.from(context).
-                    inflate(R.layout.vkalbum_list_header, parent, false);
+        switch (album.id) {
+            case ListViewItemKind.PlayListHeader:
+                return LayoutInflater.from(mContext).
+                        inflate(R.layout.vkalbum_list_header, parent, false);
+
+            case ListViewItemKind.EmptyList:
+                return LayoutInflater.from(mContext).
+                        inflate(R.layout.vkalbum_list_empty, parent, false);
+
+            default:
+                if (convertView == null)
+                    convertView = LayoutInflater.from(mContext).
+                            inflate(R.layout.vkalbum_list_item, parent, false);
         }
 
-        else if (album.album_id == ListViewItemKind.EmptyList){
-            return LayoutInflater.from(context).
-                    inflate(R.layout.vkalbum_list_empty, parent, false);
+//        if (album.id == ListViewItemKind.PlayListHeader){
+//            return LayoutInflater.from(mContext).
+//                    inflate(R.layout.vkalbum_list_header, parent, false);
+//        }
+//
+//        else if (album.id == ListViewItemKind.EmptyList){
+//            return LayoutInflater.from(mContext).
+//                    inflate(R.layout.vkalbum_list_empty, parent, false);
+//
+//        }
+//        else {
+//            convertView = LayoutInflater.from(mContext).
+//                    inflate(R.layout.vkalbum_list_item, parent, false);
+//        }
 
-        }
-        else {
-            convertView = LayoutInflater.from(context).
-                    inflate(R.layout.vkalbum_list_item, parent, false);
-        }
+        if (convertView == null)
+            return null;
 
         ViewHolder viewHolder = (ViewHolder)convertView.getTag();
         if (viewHolder == null){
@@ -116,13 +134,13 @@ public class VKAlbumListAdapter extends BaseAdapter {
 
                 VKAlbum vkAlbum = holder.getAlbum();
 
-                if (vkAlbum.album_id != selectedAlbum.album_id) {
+                if (vkAlbum.id != selectedAlbum.id) {
                     vkAlbum.setIsSelected(true);
                     selectedAlbum.setIsSelected(false);
                     selectedAlbum = vkAlbum;
                 }
 
-                AudioListLoader.setmAlbumId(vkAlbum.album_id);
+                AudioListLoader.setmAlbumId(vkAlbum.id);
                 AudioListLoader.refresh();
             }
         });
@@ -164,8 +182,8 @@ public class VKAlbumListAdapter extends BaseAdapter {
     }
 
     private class ListViewItemKind {
-        public static final long EmptyList = -2;
-        public static final long PlayListHeader = -1;
-        public static final long MyMusic = 0;
+        public static final int EmptyList = -2;
+        public static final int PlayListHeader = -1;
+        public static final int MyMusic = 0;
     }
 }

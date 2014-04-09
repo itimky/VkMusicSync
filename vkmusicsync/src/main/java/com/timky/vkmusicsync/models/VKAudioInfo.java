@@ -1,7 +1,7 @@
 package com.timky.vkmusicsync.models;
 
-import com.vk.sdk.api.model.VKAudio;
-import com.vk.sdk.api.model.VKAudioArray;
+import com.vk.sdk.api.model.VKApiArray;
+import com.vk.sdk.api.model.VKApiAudio;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -15,14 +15,14 @@ public class VKAudioInfo extends DownloadInfo{
     public final String artist;
     public final String title;
 
-    public VKAudioInfo(VKAudio audio) throws MalformedURLException {
+    public VKAudioInfo(VKApiAudio audio) throws MalformedURLException {
         super(audio.url, audio.artist + " - " + audio.title, ".mp3");
         this.id = audio.id;
         this.artist = audio.artist;
         this.title = audio.title;
     }
 
-    public static List<VKAudioInfo> toList(VKAudioArray audios) throws MalformedURLException {
+    public static List<VKAudioInfo> toList(VKApiArray<VKApiAudio> audios) throws MalformedURLException {
         List<VKAudioInfo> result = new ArrayList<VKAudioInfo>();
 
         for (int i = 0; i < audios.size(); i++)

@@ -75,6 +75,4 @@ public abstract class VKSdkListener {
 	}
 
     public abstract void onAuthDecline();
-
-
 }

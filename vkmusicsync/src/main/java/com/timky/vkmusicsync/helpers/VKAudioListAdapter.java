@@ -1,10 +1,13 @@
 package com.timky.vkmusicsync.helpers;
 
 import android.app.AlertDialog;
+import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
 import android.view.LayoutInflater;
@@ -18,6 +21,7 @@ import android.widget.TextView;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.Tracker;
+import com.timky.vkmusicsync.MusicListActivity;
 import com.timky.vkmusicsync.R;
 import com.timky.vkmusicsync.models.DownloadInfo;
 import com.timky.vkmusicsync.models.TaskState;
@@ -41,8 +45,6 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
     private final Context mContext;
     private NotificationCompat.Builder mBuilder;
     private NotificationManager mNotifyManager;
-    //private int mTotal;
-    //private int mProgress;
     private double mProgressSizeSinceUpdate = 0;
     private double mLastProgressSize = 0;
 
@@ -52,9 +54,6 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
         mBuilder = new NotificationCompat.Builder(context);
         mNotifyManager = (NotificationManager) context.
                 getSystemService(Context.NOTIFICATION_SERVICE);
-
-        //mTotal = 0;
-        //mProgress = 0;
     }
 
     public void refresh(List<VKAudioInfo> audioInfoList){
@@ -88,14 +87,6 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
 
         invalidateMenu();
     }
-//
-//    public void cancelAllTasks(){
-//        for (VKAudioInfo audioInfo : mAudioInfoList)
-//            audioInfo.cancelDownload();
-//
-//        //mProgress = 0;
-//        //mTotal = 0;
-//    }
 
     @Override
     public int getCount() {
@@ -198,17 +189,44 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
                 }
             }
         });
+        convertView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (audioInfo.isDownloaded() && audioInfo.getTaskId() == DownloadManager.mNoTaskId) {
+                    DialogInterface.OnClickListener dialogClickListener =
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (which == DialogInterface.BUTTON_POSITIVE) {
+                                        mAudioDownloadManager.delete(audioInfo);
+                                    }
+                                }
+                            };
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                    builder.setMessage(mContext.getString(R.string.message_delete_file, audioInfo.getFileName()))
+                            .setNegativeButton(R.string.dialog_no, dialogClickListener)
+                            .setPositiveButton(R.string.dialog_yes, dialogClickListener).show();
+
+                    return true;
+                }
+
+                return false;
+            }
+        });
     }
 
     @Override
     public void onDownloadPrepare(DownloadInfo downloadInfo) {
         // Updating total downloads
         DownloadInfo current = mAudioDownloadManager.getCurrentTask();
-        mBuilder.setContentText(mContext.getString(R.string.notification_progress_template,
-                                current.getDownloadedSize(), current.getTotalSize(),
-                                mAudioDownloadManager.getProgress(),
-                                mAudioDownloadManager.getTotal())
-                );
+        if (current != null)
+            mBuilder.setContentText(mContext.getString(R.string.notification_progress_template,
+                                    current.getDownloadedSize(), current.getTotalSize(),
+                                    mAudioDownloadManager.getProgress(),
+                                    mAudioDownloadManager.getTotal())
+                                    )
+                    .setAutoCancel(false);
         mNotifyManager.notify(0, mBuilder.build());
     }
 
@@ -217,6 +235,14 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
         notifyAction(Events.DOWNLOAD_BEGIN);
         clearBuilder();
         VKAudioInfo audioInfo = (VKAudioInfo) downloadInfo;
+
+        Intent intent = new Intent(mContext, MusicListActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                mContext,
+                0,
+                intent,
+                0);
+
         mBuilder.setContentTitle(audioInfo.getFileName())
                 .setContentText(
                         mContext.getString(R.string.notification_progress_template,
@@ -225,9 +251,13 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
                                 mAudioDownloadManager.getTotal())
                 )
                 .setSmallIcon(R.drawable.ic_vkmusicsync_logo)
-                .setProgress(0, 0, true);
+                .setProgress(0, 0, true)
+                .setAutoCancel(false)
+                .setContentIntent(pendingIntent);
+        Notification notification = mBuilder.build();
+        notification.flags = Notification.FLAG_AUTO_CANCEL;
         // Displays the progress bar for the first time.
-        mNotifyManager.notify(0, mBuilder.build());
+        mNotifyManager.notify(0, notification);
     }
 
     @Override
@@ -238,7 +268,6 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
         clearBuilder();
 
         if (mAudioDownloadManager.isAllComplete()) {
-
             if (mAudioDownloadManager.getTotal() == 1) {
                 mBuilder.setContentTitle(audioInfo.getFileName())
                         .setContentText(
@@ -251,6 +280,7 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
                                 mAudioDownloadManager.getTotal())
                 );
 
+            mBuilder.setAutoCancel(true);
             mNotifyManager.notify(0, mBuilder.build());
         }
     }
@@ -261,25 +291,24 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
         // Displaying "Canceled" message
         if (mAudioDownloadManager.getDownloadingCount() == 1){
             clearBuilder();
-            if (mAudioDownloadManager.getCanceled() == 1){
+            if (mAudioDownloadManager.getCanceled() == 1)
                 mBuilder.setContentTitle(mContext.getString(R.string.notification_download_canceled));
-                mNotifyManager.notify(0, mBuilder.build());
-            }
-            else {
+            else
                 mBuilder.setContentTitle(mContext.getString(R.string.notification_download_all_canceled));
-                mNotifyManager.notify(0, mBuilder.build());
-            }
+
+            mBuilder.setAutoCancel(true);
         }
         else {
             // Updating total downloads
             DownloadInfo current = mAudioDownloadManager.getCurrentTask();
-            mBuilder.setContentText(mContext.getString(R.string.notification_progress_template,
+            if (current != null)
+                mBuilder.setContentText(mContext.getString(R.string.notification_progress_template,
                             current.getDownloadedSize(), current.getTotalSize(),
                             mAudioDownloadManager.getProgress(),
-                            mAudioDownloadManager.getTotal())
-            );
-            mNotifyManager.notify(0, mBuilder.build());
+                            mAudioDownloadManager.getTotal()));
         }
+
+        mNotifyManager.notify(0, mBuilder.build());
     }
 
     /**
@@ -300,7 +329,8 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
                                     downloadedSize, totalSize,
                                     mAudioDownloadManager.getProgress(),
                                     mAudioDownloadManager.getTotal())
-                    );
+                    )
+                    .setAutoCancel(false);
             mNotifyManager.notify(0, mBuilder.build());
             mProgressSizeSinceUpdate = 0;
         }
@@ -320,8 +350,8 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
     }
 
     private void clearBuilder(){
-        mBuilder.setContentTitle(null)
-                .setContentText(null)
+        mBuilder.setContentTitle("")
+                .setContentText("")
                 .setProgress(0, 0, false);
         mLastProgressSize = 0;
         mProgressSizeSinceUpdate = 0;

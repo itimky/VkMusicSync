@@ -2,8 +2,6 @@ package com.timky.vkmusicsync.models;
 
 import android.util.Pair;
 
-import com.mpatric.mp3agic.NotSupportedException;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -54,6 +52,23 @@ public class AsyncList<T> implements Iterable<T>{
             mQueue.add(new Pair<T, Boolean>(item, false));
         else
             mAsyncList.remove(item);
+    }
+
+    public T findById(int id) {
+        if (mAsyncList.size() == 0 || !(mAsyncList.get(0) instanceof IIdObject))
+            return null;
+
+        T result = null;
+
+        for (T item : this)
+            if (((IIdObject)item).getId() == id) {
+                result = item;
+                break;
+            }
+
+        endIterating();
+
+        return result;
     }
 
     public T get(int location){

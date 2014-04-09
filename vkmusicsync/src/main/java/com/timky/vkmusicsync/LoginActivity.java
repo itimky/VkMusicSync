@@ -102,7 +102,7 @@ public class LoginActivity extends Activity {
             SharedPreferences.Editor edit = prefs.edit();
             edit.remove(LoginActivity.tokenKey);
             edit.commit();
-            VKSdk.setAccessToken(null, true);
+            //VKSdk.setAccessToken(null, true);
         }
 
         startLoginActivity(context);

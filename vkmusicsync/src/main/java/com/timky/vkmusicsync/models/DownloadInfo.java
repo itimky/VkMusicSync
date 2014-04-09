@@ -2,6 +2,7 @@ package com.timky.vkmusicsync.models;
 
 import android.os.Environment;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -14,7 +15,6 @@ public class DownloadInfo implements Comparable<DownloadInfo> {
     private final AsyncList<IDownloadListener> mDownloadListenerList = new AsyncList<IDownloadListener>();
     private double mDownloadedSize = 0;
     private double mTotalSize = 0;
-    //private TaskState mTaskState = TaskState.NONE;
     private boolean mIsDownloaded = false;
     private final URL mUrl;
     private String mFilePath = "";
@@ -35,34 +35,18 @@ public class DownloadInfo implements Comparable<DownloadInfo> {
         mFileExtension = fileExtension.contains(".") ? fileExtension : "." + fileExtension;
     }
 
-//    public TaskState getState() {
-//        return mTaskState;
-//    }
-
     public void setDownloaded(boolean isDownloaded, String fullFilePath) {
         mIsDownloaded = isDownloaded;
 
         for (IDownloadListener listener : mDownloadListenerList)
             listener.onDownloadedChanged(isDownloaded, fullFilePath);
-
-//        if (mTaskState == TaskState.JUST_DOWNLOADED)
-//            mTaskState = TaskState.DOWNLOADED;
     }
 
-//    public final boolean isTaskRunning(){
-//        return mTaskState == TaskState.PREPARE ||
-//                mTaskState == TaskState.DOWNLOADING;
-//    }
-
-//    public final boolean isDownloading() {
-//        return mTaskState == TaskState.DOWNLOADING;
-//    }
     public final boolean isDownloaded() {
         return mIsDownloaded;
     }
 
     public void prepareDownload(){
-        //mTaskState = TaskState.PREPARE;
         mDownloadedSize = 0;
         mTotalSize = 0;
 
@@ -71,28 +55,24 @@ public class DownloadInfo implements Comparable<DownloadInfo> {
     }
 
     public void startDownload(){
-        //mTaskState = TaskState.DOWNLOADING;
 
         for (IDownloadListener listener :mDownloadListenerList)
             listener.onDownloadBegin(this);
     }
 
     public void completeDownload(){
-        //mTaskState = TaskState.COMPLETE;
 
         for (IDownloadListener listener : mDownloadListenerList)
             listener.onDownloadComplete(this);
     }
 
     public void cancelDownload(){
-        //mTaskState = TaskState.CANCELED;
 
         for (IDownloadListener listener : mDownloadListenerList)
             listener.onDownloadCancel(this);
     }
 
     public void abortDownload(){
-        //mTaskState = TaskState.CANCELED;
     }
 
     public final double getDownloadedSize() {
@@ -130,7 +110,6 @@ public class DownloadInfo implements Comparable<DownloadInfo> {
     }
 
     public void raiseError(TaskResult result){
-        //mTaskState = TaskState.ERROR;
 
         for (IDownloadListener listener : mDownloadListenerList)
             listener.onDownloadError(result);
@@ -152,14 +131,6 @@ public class DownloadInfo implements Comparable<DownloadInfo> {
         return mFilePath;
     }
 
-    //public final boolean isCanceling(){
-    //    return mTaskState == TaskState.CANCELING;
-    //}
-
-//    public final boolean isCanceled(){
-//        return mTaskState == TaskState.CANCELED;
-//    }
-
     public int getTaskId(){
         return mTaskId;
     }
@@ -172,6 +143,14 @@ public class DownloadInfo implements Comparable<DownloadInfo> {
     public int compareTo(DownloadInfo another){
         return getFileName().compareTo(another.getFileName());
     }
+
+//    public void delete() {
+//        if (!mIsDownloaded)
+//            return;
+//
+//        File file = new File(getFileFullName(mFilePath));
+//        file.delete();
+//    }
 
     //[\]\[|\\?*<":>+/']
 }

@@ -22,8 +22,10 @@
     <string name="dialog_yes">Да</string>
 
     <string name="error_need_re_login">Необходимо заново авторизоваться</string>
+    <string name="error_no_internet_access">Нет доступа в интернет</string>
 
     <string name="message_already_downloaded">Этот трек уже был загружен. Хотите перезаписать его?</string>
+    <string name="message_delete_file" formatted="false">Вы действительно хотите удалить файл %s?</string>
     <string name="message_cancel_all_downloads">Отменить все загрузки?</string>
     <string name="message_cancel_download">Отменить загрузку?</string>
     <string name="message_sync_first_n">Введите количество песен.\n(0 - скачать все свои аудиозаписи, может занять много времени)</string>

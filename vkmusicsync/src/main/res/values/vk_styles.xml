@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:custom="http://schemas.android.com/apk/res/com.handmark.pulltorefresh.library">
 
-    <!--<style name="VkTheme" parent="@android:style/Theme.Light">-->
-        <!--<item name="android:textColor">@color/vk_color</item>-->
-    <!--</style>-->
     <style name="VkTheme" parent="Theme.AppCompat.Light">
+        <!-- Support library compatibility -->
+        <item name="actionBarStyle">@style/VkActionBarStyle</item>
         <item name="android:textColor">@color/VkDarkColor</item>
+    </style>
+
+    <style name="VkActionBarStyle" parent="Widget.AppCompat.ActionBar">
+        <!-- Support library compatibility -->
+        <item name="background">@color/vk_color</item>
     </style>
 
     <style name="VKListViewStyle">
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">fill_parent</item>
-        <!--<item name="android:paddingLeft">@dimen/activity_horizontal_margin</item>-->
-        <!--<item name="android:paddingRight">@dimen/activity_horizontal_margin</item>-->
-        <!--<item name="android:divider">@color/VkDarkColor</item>-->
-        <!--<item name="android:dividerHeight">1px</item>-->
     </style>
 
     <style name="VKListViewStyle.PullToRefresh">
@@ -84,7 +84,6 @@
         <item name="android:visibility">gone</item>
         <item name="android:progressDrawable">@drawable/custom_progressbar</item>
         <item name="android:indeterminateDrawable">@android:drawable/progress_indeterminate_horizontal</item>
-        <!--<item name="android:indeterminateDrawable">@drawable/custom_indeterminate_progressbar</item>-->
     </style>
 
     <style name="VkTextViewButtonStyle">
@@ -120,19 +119,4 @@
         <item name="android:weightSum">100</item>
     </style>
 
-    <color name="VkDarkColor">#111111</color>
-    <color name="transparent">#00000000</color>
-    <!--<color name="VkLightBlueColor">#55B5BC</color>-->
-
 </resources>
-
-<!--<ProgressBar-->
-<!--android:id="@+id/bar_progress"-->
-<!--android:layout_width="fill_parent"-->
-<!--android:layout_height="3dp"-->
-<!--android:max="100"-->
-<!--android:progressDrawable="@drawable/custom_progressbar"-->
-<!--android:indeterminate="true"-->
-<!--android:visibility="gone"-->
-<!--android:layout_marginLeft="5dp"-->
-<!--style="?android:attr/progressBarStyleHorizontal" />-->

@@ -4,19 +4,18 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 
-import com.timky.vkmusicsync.models.ErrorCodes;
 import com.timky.vkmusicsync.models.IAlbumListLoadListener;
 import com.timky.vkmusicsync.models.IAudioListLoadListener;
 import com.timky.vkmusicsync.models.TaskResult;
 import com.timky.vkmusicsync.models.VKAlbum;
 import com.timky.vkmusicsync.models.VKAlbumArray;
+import com.timky.vkmusicsync.models.VKAudioArray;
 import com.timky.vkmusicsync.models.VKAudioInfo;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
-import com.vk.sdk.api.model.VKAudioArray;
 
 import org.json.JSONArray;
 import org.json.JSONException;

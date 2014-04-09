@@ -3,8 +3,10 @@ package com.timky.vkmusicsync.helpers;
 import android.os.AsyncTask;
 import android.os.Environment;
 
+import com.mpatric.mp3agic.NotSupportedException;
 import com.timky.vkmusicsync.models.AsyncList;
 import com.timky.vkmusicsync.models.DownloadInfo;
+import com.timky.vkmusicsync.models.IIdObject;
 import com.timky.vkmusicsync.models.TaskState;
 import com.timky.vkmusicsync.models.ErrorCodes;
 import com.timky.vkmusicsync.models.TaskResult;
@@ -18,7 +20,9 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 /**
- * Download manager for any task
+ * Download manager for any task. Executes only 1 task at the same time.
+ * Somehow in Android 2.3.3 AsyncTask.execute() == AsyncTask.executeOnExecutor(),
+ * that's why this manager controls order of tasks
  * Created by timky on 03.04.14.
  */
 public class DownloadManager {
@@ -54,38 +58,16 @@ public class DownloadManager {
     }
 
     public void cancelAllTasks() {
-        for (DownloadTask task : mTasks) //{
+        for (DownloadTask task : mTasks)
             task.cancel();
-//            TaskState state = task.mDownloadInfo.getState();
-//            if (state == TaskState.PREPARE) {
-//                mTasks.remove(task);
-//                mCanceled++;
-//                task.mDownloadInfo.cancelDownload();
-//            }
-//            else if (state == TaskState.DOWNLOADING)
-//                task.mDownloadInfo.abortDownload();
-//        }
     }
 
     public void cancelTask(DownloadInfo downloadInfo){
         int taskId = downloadInfo.getTaskId();
-        for (DownloadTask task : mTasks)// {
-            if (task.taskId == taskId) //{
-                task.cancel();
-//            }
-//        if (state == TaskState.PREPARE) {
-//
-//
-//                    //mTasks.remove(task);
-//                    //downloadInfo.setTaskId(mNoTaskId);
-//                }
-//            //mCanceled++;
-//            checkIsDownloaded(downloadInfo);
-//            downloadInfo.cancelDownload();
-//        }
-//        else if (state == TaskState.DOWNLOADING)
-//            downloadInfo.abortDownload();
+        DownloadTask task = mTasks.findById(taskId);
 
+        if (task != null)
+            task.cancel();
     }
 
     public DownloadInfo getCurrentTask() {
@@ -117,11 +99,21 @@ public class DownloadManager {
         DownloadTask task = new DownloadTask(downloadInfo);
         mTasks.add(task);
         mTotal++;
-        task.execute();
+        task.prepare();
+
+        if (mTotal == 1) {
+            task.execute();
+        }
+    }
+
+    private void next() {
+        if (mTasks.size() != 0) {
+            mTasks.get(0).execute();
+        }
     }
 
     protected class DownloadTask extends AsyncTask<Void, Integer, TaskResult>
-                                            implements Comparable<DownloadInfo>{
+                                            implements Comparable<DownloadInfo>, IIdObject {
         protected final DownloadInfo mDownloadInfo;
         private TaskState mState = TaskState.PREPARE;
         public final int taskId;
@@ -136,6 +128,7 @@ public class DownloadManager {
             if (mState == TaskState.PREPARE) {
                 checkIsDownloaded(mDownloadInfo);
                 mDownloadInfo.cancelDownload();
+                mTasks.remove(this);
             }
             else if (mState == TaskState.DOWNLOADING)
                 mDownloadInfo.abortDownload();
@@ -143,6 +136,11 @@ public class DownloadManager {
             mDownloadInfo.setTaskId(mNoTaskId);
             mState = TaskState.CANCELED;
             mCanceled++;
+        }
+
+        public void prepare() {
+            mState = TaskState.PREPARE;
+            mDownloadInfo.prepareDownload();
         }
 
         public TaskState getState() {
@@ -154,23 +152,15 @@ public class DownloadManager {
         }
 
         @Override
-        protected void onPreExecute(){
-            mState = TaskState.PREPARE;
-            mDownloadInfo.prepareDownload();
-        }
-
-        @Override
         protected TaskResult doInBackground(Void... params) {
             TaskResult result =  new TaskResult();
 
             if (mDownloadInfo.getTaskId() != taskId) {
-                //result.taskState = TaskState.CANCELED;
                 return result;
             }
 
             mDownloadInfo.startDownload();
             mState = TaskState.DOWNLOADING;
-            //result.taskState = TaskState.DOWNLOADING;
 
             String directoryPath = Environment.getExternalStorageDirectory().getPath() + "/" + mFilePath;
             String fileName = mTempFileName != null ? mTempFileName : mDownloadInfo.getFileName()
@@ -236,18 +226,17 @@ public class DownloadManager {
                 fileOutput.flush();
                 fileOutput.close();
                 result.fullFileName = directoryPath + fileName;
+                mState = TaskState.COMPLETE;
 
             } catch (UnknownHostException e) {
                 e.printStackTrace();
                 result.errorMessage = "No internet access...";
                 result.errorCode = ErrorCodes.connectionRefused;
                 mState = TaskState.ERROR;
-                //result.taskState = TaskState.ERROR;
             } catch (IOException e) {
                 e.printStackTrace();
                 result.errorMessage = "IOException...";
                 mState = TaskState.ERROR;
-                //result.taskState = TaskState.ERROR;
             }
 
             completeExecuteInBackground(this, result);
@@ -268,7 +257,7 @@ public class DownloadManager {
                     mProgress++;
                     mDownloadInfo.setTaskId(mNoTaskId);
                     mDownloadInfo.completeDownload();
-                    checkIsJustDownloaded(mDownloadInfo);
+                    checkIsDownloaded(mDownloadInfo);
                     break;
 
                 case ERROR:
@@ -279,19 +268,13 @@ public class DownloadManager {
                     break;
 
                 case CANCELED:
-                    //mCanceled++;
-                    //mDownloadInfo.setTaskId(mNoTaskId);
                     mDownloadInfo.cancelDownload();
                     checkIsDownloaded(mDownloadInfo);
                     break;
-
-//                case CANCELED:
-//                    mCanceled++;
-//                    checkIsDownloaded(mDownloadInfo);
-//                    break;
             }
 
             mTasks.remove(this);
+            next();
         }
 
         @Override
@@ -299,14 +282,20 @@ public class DownloadManager {
             return mDownloadInfo.compareTo(another);
         }
 
-//        public final class DownloadResult extends TaskResult {
-//            public TaskState taskState = TaskState.NONE;
-//        }
+        @Override
+        public int getId() {
+            return taskId;
+        }
+
+        @Override
+        public void setId(int id) throws NotSupportedException {
+            throw new NotSupportedException();
+        }
     }
 
     /**
      * Implement here background work after download
-     * @param downloadInfo
+     * @param task
      * @param result
      * @return
      */
@@ -314,10 +303,11 @@ public class DownloadManager {
         return result;
     }
 
-    public void checkIsJustDownloaded(DownloadInfo downloadInfo){
+    public void delete(DownloadInfo downloadInfo) {
         File file = new File(downloadInfo.getFileFullName(mFilePath));
-        if(file.exists())
-            downloadInfo.setDownloaded(true, mFilePath);
+        file.delete();
+
+        downloadInfo.setDownloaded(false, mFilePath);
     }
 
     public void checkIsDownloaded(DownloadInfo downloadInfo){
@@ -330,7 +320,6 @@ public class DownloadManager {
         for (DownloadInfo downloadInfo : downloadableList)
             checkIsDownloaded(downloadInfo);
     }
-
 
     public static void checkIsDownloaded(DownloadInfo downloadInfo, String filePath){
         File file = new File(downloadInfo.getFileFullName(filePath));

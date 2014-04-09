@@ -21,7 +21,7 @@ public class TaskResult {
                     LoginActivity.reLogin(context);
                     break;
                 case ErrorCodes.connectionRefused:
-                    Toast.makeText(context, context.getString(R.string.vk_no_internet_access),
+                    Toast.makeText(context, context.getString(R.string.error_no_internet_access),
                             Toast.LENGTH_SHORT).show();
                     break;
                 default:

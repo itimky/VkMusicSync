@@ -103,17 +103,9 @@ public class ViewHolder implements IDownloadListener {
 
         this.downloaded.setVisibility(isDownloaded ? View.VISIBLE : View.GONE);
 
-        // If just downloaded - updating media cache
-        if (isDownloaded) {
-            mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
-                    Uri.parse("file://" + audioInfo.getFileFullName(fullFilePath))));
-//            mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
-//                    + audioInfo.getFileFullName(fullFilePath))));
-//            MediaScannerConnection.scanFile(mContext,
-//                    new String[]{ audioInfo.getFilePath() },
-//                    new String[]{ "*/*" },
-//                    null);
-        }
+        // Updating media cache
+        mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                Uri.parse("file://" + audioInfo.getFileFullName(fullFilePath))));
     }
 
     @Override

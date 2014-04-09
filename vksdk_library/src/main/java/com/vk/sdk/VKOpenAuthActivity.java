@@ -28,7 +28,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -68,11 +68,6 @@ public class VKOpenAuthActivity extends Activity {
         hideActionBar();
         findViewById(android.R.id.content).setBackgroundColor(Color.rgb(240, 242, 245));
         loadPage();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
     }
 
     private void loadPage() {
@@ -119,20 +114,30 @@ public class VKOpenAuthActivity extends Activity {
 
     private class OAuthWebViewClient extends WebViewClient {
         public boolean canShowPage = true;
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        private boolean processUrl(String url) {
             if (url.startsWith(REDIRECT_URL)) {
-                Log.d("WebView", url);
                 Intent data = new Intent(VK_RESULT_INTENT_NAME);
                 data.putExtra(VK_EXTRA_TOKEN_DATA, url.substring(url.indexOf('#') + 1));
-	            if (getIntent().hasExtra(VK_EXTRA_VALIDATION_URL))
-		            data.putExtra(VK_EXTRA_VALIDATION_URL, true);
+                if (getIntent().hasExtra(VK_EXTRA_VALIDATION_URL))
+                    data.putExtra(VK_EXTRA_VALIDATION_URL, true);
                 setResult(RESULT_OK, data);
                 finish();
                 return true;
             }
+            return false;
+        }
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            if (processUrl(url))
+                return true;
             canShowPage = true;
             return false;
+        }
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            super.onPageStarted(view, url, favicon);
+            processUrl(url);
         }
 
         @Override
@@ -148,7 +153,7 @@ public class VKOpenAuthActivity extends Activity {
             canShowPage = false;
             if (errorCode == -2)
                 description = getString(R.string.vk_no_internet_access);
-            new AlertDialog.Builder(VKOpenAuthActivity.this)
+            AlertDialog.Builder builder = new AlertDialog.Builder(VKOpenAuthActivity.this)
                     .setMessage(description)
                     .setPositiveButton(R.string.vk_retry, new DialogInterface.OnClickListener() {
                         @Override
@@ -161,7 +166,13 @@ public class VKOpenAuthActivity extends Activity {
                         public void onClick(DialogInterface dialogInterface, int i) {
                             finish();
                         }
-                    }).show();
+                    });
+            try {
+                builder.show();
+            } catch (Exception e) {
+                if (VKSdk.DEBUG)
+                	e.printStackTrace();
+            }
         }
     }
 

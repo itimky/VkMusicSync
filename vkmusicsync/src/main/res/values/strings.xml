@@ -22,8 +22,10 @@
     <string name="dialog_yes">Yes</string>
 
     <string name="error_need_re_login">Need re-login</string>
+    <string name="error_no_internet_access">No internet access</string>
 
     <string name="message_already_downloaded">This track has been already downloaded. Do you want to overwrite it?</string>
+    <string name="message_delete_file" formatted="false">Are you sure to delete file %s?</string>
     <string name="message_cancel_all_downloads">Cancel all downloads?</string>
     <string name="message_cancel_download">Cancel download?</string>
     <string name="message_sync_first_n">Type number of songs.\n(0 - download all of your music, may take a long time)</string>

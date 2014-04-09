@@ -4,12 +4,17 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
+import android.support.v7.app.ActionBar;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -54,6 +59,11 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
         super.onCreate(savedInstanceState);
         removeTempFile();
         initialize();
+
+        // In Android 2.3.3 logo setup in AndroidManifest.xml not working
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setLogo(R.drawable.ic_vkmusicsync_logo);
+
         AudioListLoader.initialize(pageSize);
         AudioListLoader.setAudioSupport(mAudioListAdapter, this);
     }
@@ -192,11 +202,22 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
 
         boolean downloading = mAudioDownloadManager.isDownloading();
 
-        sync10.setVisible(!downloading);
-        sync50.setVisible(!downloading);
-        sync100.setVisible(!downloading);
-        syncN.setVisible(!downloading);
-        cancel.setVisible(downloading);
+
+        // Ugly, but needed
+        if (sync10 != null)
+            sync10.setVisible(!downloading);
+
+        if (sync50 != null)
+            sync50.setVisible(!downloading);
+
+        if (sync100 != null)
+            sync100.setVisible(!downloading);
+
+        if (syncN != null)
+            syncN.setVisible(!downloading);
+
+        if (cancel != null)
+            cancel.setVisible(downloading);
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -224,6 +245,7 @@ public class MusicListActivity extends SlidingFragmentActivity implements IAudio
         setContentView(R.layout.activity_music_list);
         mAudioListAdapter = new VKAudioListAdapter(this, mAudioDownloadManager);
         mAudioLoadingLayout = (RelativeLayout)findViewById(R.id.audio_loading_layout);
+        mAudioLoadingLayout.setVisibility(View.VISIBLE);
         initializePullToRefresh();
         initializeSlidingMenu();
     }

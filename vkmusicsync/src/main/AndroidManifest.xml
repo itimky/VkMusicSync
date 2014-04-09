@@ -9,7 +9,6 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_vkmusicsync_launcher"
-        android:logo="@drawable/ic_vkmusicsync_logo"
         android:label="@string/app_name"
         android:theme="@style/VkTheme" >
         <activity
@@ -24,7 +23,8 @@
         <activity
             android:name=".MusicListActivity"
             android:label=""
-            android:configChanges="orientation|keyboardHidden|screenSize" />
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleTop"/>
 
     </application>
 

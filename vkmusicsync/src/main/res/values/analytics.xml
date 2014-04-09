@@ -2,7 +2,6 @@
 <resources>
     <string name="ga_trackingId">UA-49741867-1</string>
     <bool name="ga_reportUncaughtExceptions">true</bool>
-    <!--<bool name="ga_debug">true</bool>-->
     <string name="ga_logLevel">info</string>
     <bool name="ga_autoActivityTracking">true</bool>
 </resources>
