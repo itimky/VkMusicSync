@@ -9,7 +9,7 @@ repositories {
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.3"
+    buildToolsVersion '19.1.0'
 
     defaultConfig {
         minSdkVersion 8
@@ -43,11 +43,11 @@ if (rootProject.tasks.hasProperty('mavenBuild')) {
 }
 
 task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.allJava
+    source = android.sourceSets.main.java
     classpath = project.files(configurations.javadoc,
         "${buildDir}/classes/release",
         project.fileTree("${buildDir}/exploded-bundles") { include '*/classes.jar' },
-        new File(android.plugin.sdkDirectory, "platforms/${android.compileSdkVersion}/android.jar"))
+        new File(android.sdkDirectory, "platforms/${android.compileSdkVersion}/android.jar"))
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -56,7 +56,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 task sourcesJar(type: Jar) {
-    from android.sourceSets.main.allSource
+    from android.sourceSets.main.java
     classifier = 'sources'
 }
 

@@ -1,7 +1,7 @@
 apply plugin: 'android'
 android {
     compileSdkVersion 19
-    buildToolsVersion '19.0.3'
+    buildToolsVersion '19.1.0'
 
     signingConfigs {
         release {
@@ -20,13 +20,13 @@ android {
     }
     buildTypes {
         debug {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
             debuggable true
         }
 
         release {
-            runProguard true
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
             debuggable false
             signingConfig signingConfigs.release
@@ -36,7 +36,7 @@ android {
 
 dependencies {
     compile files('src/main/libs/libGoogleAnalyticsServices.jar')
-    compile 'com.android.support:appcompat-v7:+'
+    compile 'com.android.support:appcompat-v7:20.0.0'
     compile 'com.android.support:support-v4:+'
     compile project(':vksdk_library')
     compile project(':mp3agic')
