@@ -37,6 +37,9 @@
     <string name="notification_download_error">Ошибка загрузки</string>
     <string name="notification_progress_template" formatted="false">%.1f Мб / %.1f Мб (%d / %d)</string>
 
+    <string name="search">Поиск</string>
+    <string name="search_title">Поиск...</string>
+
     <string name="title_activity_login">Вход</string>
 
 </resources>

@@ -1,4 +1,4 @@
-package com.timky.vkmusicsync.helpers;
+package com.timky.vkmusicsync.adapters;
 
 import android.app.AlertDialog;
 import android.app.Notification;
@@ -23,8 +23,9 @@ import com.google.analytics.tracking.android.MapBuilder;
 import com.google.analytics.tracking.android.Tracker;
 import com.timky.vkmusicsync.MusicListActivity;
 import com.timky.vkmusicsync.R;
+import com.timky.vkmusicsync.loaders.DownloadManager;
+import com.timky.vkmusicsync.loaders.VKAudioDownloadManager;
 import com.timky.vkmusicsync.models.DownloadInfo;
-import com.timky.vkmusicsync.models.TaskState;
 import com.timky.vkmusicsync.models.Events;
 import com.timky.vkmusicsync.models.IDownloadListener;
 import com.timky.vkmusicsync.models.TaskResult;
@@ -56,9 +57,8 @@ public class VKAudioListAdapter extends BaseAdapter implements IDownloadListener
                 getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
-    public void refresh(List<VKAudioInfo> audioInfoList){
-        mAudioDownloadManager.checkIsDownloaded(audioInfoList);
-        mAudioInfoList = audioInfoList;
+    public void clear() {
+        mAudioInfoList = new ArrayList<VKAudioInfo>();
         notifyDataSetChanged();
     }
 

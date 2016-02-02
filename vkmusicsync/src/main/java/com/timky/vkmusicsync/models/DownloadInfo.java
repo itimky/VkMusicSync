@@ -2,7 +2,6 @@ package com.timky.vkmusicsync.models;
 
 import android.os.Environment;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 

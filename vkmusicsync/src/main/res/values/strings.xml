@@ -37,6 +37,9 @@
     <string name="notification_download_error">Download error</string>
     <string name="notification_progress_template" formatted="false">%.1f Mb / %.1f Mb (%d / %d)</string>
 
+    <string name="search">Search</string>
+    <string name="search_title">Search...</string>
+
     <string name="title_activity_login">Login</string>
 
 </resources>

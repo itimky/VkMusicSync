@@ -9,7 +9,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.timky.vkmusicsync.R;
-import com.timky.vkmusicsync.helpers.DownloadManager;
+import com.timky.vkmusicsync.loaders.DownloadManager;
 
 /**
  * Created by timky on 14.03.14.

@@ -1,4 +1,4 @@
-package com.timky.vkmusicsync.helpers;
+package com.timky.vkmusicsync.loaders;
 
 import android.os.AsyncTask;
 import android.os.Environment;

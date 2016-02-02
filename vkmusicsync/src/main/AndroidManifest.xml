@@ -9,11 +9,12 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_vkmusicsync_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/VkTheme" >
+        android:label=""
+        android:theme="@style/VkTheme">
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name"
+            android:icon="@drawable/ic_vkmusicsync_launcher"
             android:configChanges="orientation|keyboardHidden|screenSize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,8 +24,15 @@
         <activity
             android:name=".MusicListActivity"
             android:label=""
+            android:icon="@drawable/ic_vkmusicsync_logo"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data android:name="android.app.searchable"
+                        android:resource="@xml/searchable"/>
+        </activity>
 
     </application>
 

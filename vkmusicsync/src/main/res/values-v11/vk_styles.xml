@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="VkTheme" parent="Theme.AppCompat.Light">
+    <style name="VkTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/VkActionBarStyle</item>
         <item name="android:textColor">@color/VkDarkColor</item>
     </style>
 
-    <style name="VkActionBarStyle" parent="Widget.AppCompat.ActionBar">
-        <item name="android:background">@color/vk_color</item>
-    </style>
+    <!--<style name="VkActionBarStyle" parent="Theme.AppCompat.Light.DarkActionBar">-->
+        <!--<item name="android:background">@color/vk_color</item>-->
+        <!--&lt;!&ndash;<item name="searchViewSearchIcon">@drawable/abc_ic_search</item>&ndash;&gt;-->
+    <!--</style>-->
 
 </resources>

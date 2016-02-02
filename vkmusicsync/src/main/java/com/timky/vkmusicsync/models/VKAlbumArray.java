@@ -3,7 +3,6 @@ package com.timky.vkmusicsync.models;
 import android.os.Parcel;
 
 import com.vk.sdk.api.model.VKApiArray;
-import com.vk.sdk.api.model.VKList;
 
 /**
  * Created by timky on 25.03.14.

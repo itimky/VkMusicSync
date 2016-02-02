@@ -4,8 +4,14 @@ android {
     buildToolsVersion '19.1.0'
 
     signingConfigs {
+        debug {
+            storeFile file("../timky.jks")
+            storePassword "mordor"
+            keyAlias "vkmusicsynckey"
+            keyPassword "mordor"
+        }
         release {
-            storeFile file("/home/timky/.android/timky.jks")
+            storeFile file("../timky.jks")
             storePassword "mordor"
             keyAlias "vkmusicsynckey"
             keyPassword "mordor"
@@ -23,6 +29,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
             debuggable true
+            signingConfig signingConfigs.debug
         }
 
         release {

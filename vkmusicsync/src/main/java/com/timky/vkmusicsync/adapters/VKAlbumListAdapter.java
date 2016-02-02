@@ -1,4 +1,4 @@
-package com.timky.vkmusicsync.helpers;
+package com.timky.vkmusicsync.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.timky.vkmusicsync.AlbumMenuFragment;
 import com.timky.vkmusicsync.R;
 import com.timky.vkmusicsync.models.IAlbumSelectedListener;
 import com.timky.vkmusicsync.models.VKAlbum;
@@ -21,13 +22,14 @@ import java.util.List;
  * Created by timky on 25.03.14.
  */
 public class VKAlbumListAdapter extends BaseAdapter {
-
     private List<VKAlbum> albumList = new ArrayList<VKAlbum>();
     private final Context mContext;
+    private final AlbumMenuFragment mFragment;
     private VKAlbum selectedAlbum;
 
-    public VKAlbumListAdapter(Context context){
+    public VKAlbumListAdapter(Context context, AlbumMenuFragment fragment){
         this.mContext = context;
+        this.mFragment = fragment;
     }
 
     public void refresh(List<VKAlbum> albumList){
@@ -55,8 +57,8 @@ public class VKAlbumListAdapter extends BaseAdapter {
 
         selectedAlbum = myMusic;
         notifyDataSetChanged();
-
-        AudioListLoader.setmAlbumId(selectedAlbum.id);
+        mFragment.onAlbumSelected(selectedAlbum.id);
+        //com.timky.vkmusicsync.helpers.ListLoader.setAlbumId(selectedAlbum.id);
     }
 
     @Override
@@ -140,8 +142,9 @@ public class VKAlbumListAdapter extends BaseAdapter {
                     selectedAlbum = vkAlbum;
                 }
 
-                AudioListLoader.setmAlbumId(vkAlbum.id);
-                AudioListLoader.refresh();
+                mFragment.onAlbumSelected(selectedAlbum.id);
+                //com.timky.vkmusicsync.helpers.ListLoader.setAlbumId(vkAlbum.id);
+                //com.timky.vkmusicsync.helpers.ListLoader.refresh();
             }
         });
 

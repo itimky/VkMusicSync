@@ -3,12 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.timky.vkmusicsync.MusicListActivity" >
 
-    <item
-        android:id="@+id/action_logout"
-        android:icon="@drawable/ic_vkmusicsync_logout"
-        android:title="@string/action_logout"
-        android:orderInCategory="100"
-        app:showAsAction="always" />
+    <item android:id="@+id/search"
+        android:title="@string/search"
+        android:icon="@drawable/abc_ic_search"
+        app:showAsAction="ifRoom"
+        app:actionViewClass="android.support.v7.widget.SearchView"/>
 
     <item android:id="@+id/sync_first_10"
         android:title="@string/action_sync_first_10"
@@ -33,5 +32,12 @@
     <item android:id="@+id/sync_cancel"
         android:title="@string/action_sync_cancel"
         android:orderInCategory="4"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_logout"
+        android:icon="@drawable/ic_vkmusicsync_logout"
+        android:title="@string/action_logout"
+        android:orderInCategory="100"
         app:showAsAction="never" />
 </menu>

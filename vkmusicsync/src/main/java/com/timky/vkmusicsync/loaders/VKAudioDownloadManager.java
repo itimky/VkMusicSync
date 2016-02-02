@@ -1,4 +1,4 @@
-package com.timky.vkmusicsync.helpers;
+package com.timky.vkmusicsync.loaders;
 
 import com.mpatric.mp3agic.ID3v1;
 import com.mpatric.mp3agic.ID3v2;
